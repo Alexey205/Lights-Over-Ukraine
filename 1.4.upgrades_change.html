@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lights Over Ukraine</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        html,
+        body {
+            margin: 0;
+            height: 100%;
+        }
+
+        #map {
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .progress-container {
+            width: 60px;
+            height: 6px;
+            background-color: rgba(100, 100, 100, 0.4);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #4caf50;
+        }
+
+        .health-container {
+            width: 60px;
+            height: 6px;
+            background-color: rgba(100, 100, 100, 0.4);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .health-bar {
+            transition: width 0.1s linear;
+            height: 100%;
+            width: 100%;
+            background-color: rgba(244, 67, 54, 0.7);
+        }
+
+        .status-working {
+            color: green;
+        }
+
+        .status-damaged {
+            color: red;
+        }
+
+        .tooltip-hidden .leaflet-tooltip {
+            display: none;
+        }
+
+        #teamsStatus {
+            font-weight: bold;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #ddd;
+        }
+
+        .warning-message {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-family: sans-serif;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+            animation: highlight 0.5s ease 2;
+            animation-delay: 1s;
+        }
+
+        .warning-message.good-news {
+            background: rgba(76, 175, 80, 0.9);
+            /* Зелений колір */
+            animation: highlight-green 0.5s ease 2;
+            animation-delay: 1s;
+        }
+
+        .warning-message.bad-news {
+            background: rgba(255, 87, 34, 0.9);
+            /* Поточний помаранчевий */
+            animation: highlight 0.5s ease 2;
+            animation-delay: 1s;
+        }
+
+        @keyframes highlight-green {
+            0% {
+                transform: translateX(-50%) scale(1);
+            }
+
+            50% {
+                transform: translateX(-50%) scale(1.1);
+            }
+
+            100% {
+                transform: translateX(-50%) scale(1);
+            }
+        }
+
+        @keyframes highlight {
+            0% {
+                transform: translateX(-50%) scale(1);
+            }
+
+            50% {
+                transform: translateX(-50%) scale(1.1);
+            }
+
+            100% {
+                transform: translateX(-50%) scale(1);
+            }
+        }
+
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                top: 10px;
+            }
+        }
+
+        .city-disabled {
+            background: radial-gradient(circle, rgba(120, 120, 120, 1) 0%, rgba(120, 120, 120, 0.8) 50%, rgba(120, 120, 120, 0) 100%);
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            z-index: -1;
+        }
+
+        .leaflet-tooltip {
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .power-info {
+            font-size: 12px;
+            color: #555;
+            margin-top: 3px;
+        }
+
+        #upgradesPanel {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-family: sans-serif;
+            font-size: 14px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            line-height: 1.4;
+            width: 300px;
+        }
+
+        #upgradesPanel button {
+            display: block;
+            width: 100%;
+            margin: 8px 0;
+            padding: 8px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: #f8f8f8;
+            text-align: left;
+            transition: background 0.2s;
+        }
+
+        #upgradesPanel button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #upgradesPanel button:hover {
+            background: #e8e8e8;
+        }
+
+        #incomeRate {
+            color: #2E7D32;
+            font-weight: bold;
+        }
+
+        .panel-toggle {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            z-index: 1002;
+            font-size: 16px;
+            line-height: 1;
+            padding: 0;
+            border: none;
+        }
+
+        .panel-toggle:hover {
+            background: #f0f0f0;
+        }
+
+        #toggleUpgradesPanel {
+            top: 10px;
+            right: 10px;
+        }
+
+        #toggleStatusPanel {
+            bottom: 10px;
+            left: 10px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        #upgradesPanel,
+        #statusPanel {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        #upgradesPanel.collapsed {
+            transform: translateX(calc(100% + 10px));
+            /* Додаємо ще 10px за межі екрану */
+        }
+
+        #statusPanel.collapsed {
+            transform: translateX(calc(-100% - 10px));
+            /* Додаємо ще 10px за межі екрану */
+        }
+
+        #lives-container {
+            position: absolute;
+            top: 15px;
+            left: 4vw;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .life {
+            font-size: 24px;
+            color: #ff5252;
+        }
+
+        #game-over {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            color: white;
+            font-family: sans-serif;
+        }
+
+        #game-over h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        #restart-button {
+            padding: 12px 24px;
+            font-size: 18px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        #restart-button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <div id="toggleUpgradesPanel" class="panel-toggle">⚙️</div>
+    <div id="toggleStatusPanel" class="panel-toggle">ℹ️</div>
+    <div id="statusPanel" style="
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-family: sans-serif;
+        font-size: 14px;
+        box-shadow: 0 0 8px rgba(0,0,0,0.2);
+        z-index: 1000;
+        line-height: 1.4;
+        width: 300px;
+    "></div>
+
+    <div id="upgradesPanel">
+        <h3 style="margin-top: 0;">Ресурси: <span id="energyResources">0</span> МВт·год (<span id="incomeRate">0</span>
+            МВт/хв)</h3>
+        <button onclick="buyUpgrade('team')">+1 Бригада (100 МВт·год) → +50 МВт витрат</button>
+        <button onclick="buyUpgrade('powerPlant')">Покращити випадкову станцію (300 МВт·год) → +200 МВт</button>
+        <button onclick="buyLineUpgrade()" id="lineUpgradeBtn">
+            Покращити лінії (200 МВт·год) → Рівень 1/3
+        </button>
+        <button onclick="buyAutoRepair()" id="autoRepairBtn">
+            Автоматичний ремонт (800 МВт·год)
+        </button>
+    </div>
+
+    <!-- Контейнер для життів -->
+    <div id="lives-container">
+        <span class="life">❤️</span>
+        <span class="life">❤️</span>
+        <span class="life">❤️</span>
+    </div>
+
+    <!-- Екран завершення гри -->
+    <div id="game-over">
+        <h2>Гру завершено!</h2>
+        <p>Ви витратили всі життя</p>
+        <button id="restart-button">Грати знову</button>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const map = L.map('map').setView([48.5, 31], 6);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        const cities = {
+            'Київ': { coords: [50.45, 30.52], powerNeed: 1500 },
+            'Львів': { coords: [49.84, 24.03], powerNeed: 800 },
+            'Харків': { coords: [49.99, 36.23], powerNeed: 1200 },
+            'Одеса': { coords: [46.48, 30.73], powerNeed: 900 },
+            'Дніпро': { coords: [48.45, 34.98], powerNeed: 1100 },
+            'Запоріжжя': { coords: [47.84, 35.14], powerNeed: 700 },
+            'Луцьк': { coords: [50.75, 25.33], powerNeed: 400 },
+            'Івано-Франківськ': { coords: [48.92, 24.71], powerNeed: 450 },
+            'Тернопіль': { coords: [49.55, 25.59], powerNeed: 350 },
+            'Рівне': { coords: [50.62, 26.25], powerNeed: 300 },
+            'Чернівці': { coords: [48.29, 25.94], powerNeed: 400 },
+            'Вінниця': { coords: [49.23, 28.48], powerNeed: 500 },
+            'Житомир': { coords: [50.25, 28.66], powerNeed: 400 },
+            'Полтава': { coords: [49.59, 34.55], powerNeed: 600 },
+            'Кропивницький': { coords: [48.51, 32.26], powerNeed: 450 },
+            'Миколаїв': { coords: [46.97, 31.99], powerNeed: 550 },
+            'Херсон': { coords: [46.63, 32.6], powerNeed: 500 },
+            'Чернігів': { coords: [51.5, 31.3], powerNeed: 450 },
+            'Суми': { coords: [50.92, 34.78], powerNeed: 400 },
+            'Ужгород': { coords: [48.62, 22.3], powerNeed: 350 },
+            'Черкаси': { coords: [49.44, 32.06], powerNeed: 400 },
+            'Хмельницький': { coords: [49.42, 27.0], powerNeed: 450 },
+            'Краматорськ': { coords: [48.74, 37.58], powerNeed: 300 },
+            'Маріуполь': { coords: [47.1, 37.55], powerNeed: 600 },
+            'Сімферополь': { coords: [44.95, 34.1], powerNeed: 700 },
+            'Севастополь': { coords: [44.61, 33.53], powerNeed: 500 },
+            'Мелітополь': { coords: [46.85, 35.37], powerNeed: 250 },
+            'Луганськ': { coords: [48.57, 39.32], powerNeed: 400 },
+            'Керч': { coords: [45.35, 36.47], powerNeed: 200 },
+            'Нікополь': { coords: [47.57, 34.4], powerNeed: 300 },
+            'Біла Церква': { coords: [49.8, 30.12], powerNeed: 200 },
+            'Кременчук': { coords: [49.07, 33.42], powerNeed: 350 },
+            'Кривий Ріг': { coords: [47.91, 33.39], powerNeed: 800 }
+        };
+
+        const powerStations = [
+            { name: 'Бурштинська ТЕС', coords: [49.26, 24.63], type: 'ТЕС', powerOutput: 2800 },
+            { name: 'Південноукраїнська АЕС', coords: [47.82, 31.18], type: 'АЕС', powerOutput: 3500 },
+            { name: 'Хмельницька АЕС', coords: [50.37, 26.64], type: 'АЕС', powerOutput: 2500 },
+            { name: 'Київська ГЕС', coords: [50.58, 30.5], type: 'ГЕС', powerOutput: 500 },
+            { name: 'Запорізька АЕС', coords: [47.51, 34.58], type: 'АЕС', powerOutput: 6500 },
+            { name: 'Трипільська ТЕС', coords: [50.13, 30.79], type: 'ТЕС', powerOutput: 2200 },
+            { name: 'Криворізька ТЕС', coords: [47.98, 33.38], type: 'ТЕС', powerOutput: 1600 },
+            { name: 'Кременчуцька ГЕС', coords: [49.10, 33.42], type: 'ГЕС', powerOutput: 450 },
+            { name: 'Ботиєвська ВЕС', coords: [46.85, 36.0], type: 'ВЕС', powerOutput: 400 }
+        ];
+
+        const connections = [
+            ['Київ', 'Житомир'], ['Ботиєвська ВЕС', 'Запоріжжя'], ['Житомир', 'Рівне'], ['Рівне', 'Луцьк'], ['Луцьк', 'Львів'],
+            ['Київ', 'Чернігів'], ['Київ', 'Черкаси'], ['Київ', 'Полтава'], ['Київ', 'Трипільська ТЕС'],
+            ['Полтава', 'Харків'], ['Полтава', 'Краматорськ'], ['Краматорськ', 'Маріуполь'],
+            ['Краматорськ', 'Дніпро'], ['Дніпро', 'Запоріжжя'], ['Дніпро', 'Криворізька ТЕС'],
+            ['Дніпро', 'Кропивницький'], ['Кропивницький', 'Черкаси'], ['Кропивницький', 'Миколаїв'],
+            ['Миколаїв', 'Одеса'], ['Миколаїв', 'Херсон'], ['Херсон', 'Сімферополь'],
+            ['Сімферополь', 'Севастополь'], ['Вінниця', 'Київ'], ['Вінниця', 'Хмельницький'],
+            ['Хмельницький', 'Тернопіль'], ['Тернопіль', 'Івано-Франківськ'],
+            ['Івано-Франківськ', 'Чернівці'], ['Ужгород', 'Івано-Франківськ'],
+            ['Суми', 'Харків'], ['Суми', 'Чернігів'],
+            ['Південноукраїнська АЕС', 'Миколаїв'],
+            ['Київська ГЕС', 'Київ'], ['Кременчуцька ГЕС', 'Кременчук'], ['Криворізька ТЕС', 'Кривий Ріг'],
+            ['Трипільська ТЕС', 'Біла Церква'], ['Запорізька АЕС', 'Запоріжжя'],
+            ['Мелітополь', 'Запоріжжя'], ['Луганськ', 'Краматорськ'],
+            ['Керч', 'Сімферополь'], ['Нікополь', 'Запоріжжя'], ['Біла Церква', 'Київ'], ['Кременчук', 'Полтава'],
+            ['Бурштинська ТЕС', 'Івано-Франківськ'],
+            ['Хмельницька АЕС', 'Рівне'],
+            ['Вінниця', 'Кропивницький']
+        ];
+
+        const cityMarkers = {};
+        const lineLayers = [];
+        const powerStationMarkers = {};
+        const cityHealth = {};
+        const cityHealthMarkers = {};
+        const cityDisabledLayers = {};
+        let repairTeams = 3;
+        let difficultyMultiplier = 1;
+        let lastAttackTime = Date.now();
+        let gameStartTime = Date.now();
+        let energyResources = 0;
+        const efficiencyFactor = 0.05;
+        let isGameRunning = true;
+        let resourceUpdateCooldown = false;
+        let currentIncomeRate = 0; // Поточний дохід в МВт·год/хв
+        let balanceUpdateInterval; // Інтервал для оновлення балансу
+        let lives = 3;
+        const maxLives = 3;
+        let isGameOver = false;
+        let attackTimeout;
+
+        const repairTimes = {
+            'АЕС': 8000,
+            'ТЕС': 5000,
+            'ГЕС': 4000,
+            'ВЕС': 3000,
+            'line': 2000
+        };
+
+        const upgrades = {
+            team: {
+                cost: 100,
+                effect: () => {
+                    repairTeams++;
+                    const perCityIncrease = 50 / Object.keys(cities).length;
+                    for (const city in cities) {
+                        cities[city].powerNeed += perCityIncrease;
+                    }
+                }
+            },
+            powerPlant: {
+                cost: 300,
+                effect: () => {
+                    // Отримуємо всі станції, крім АЕС
+                    const stationNames = Object.keys(powerStationMarkers)
+                        .filter(name => powerStationMarkers[name].type !== 'АЕС');
+
+                    if (stationNames.length === 0) {
+                        showWarning("Немає доступних станцій для покращення!", false);
+                        return null;
+                    }
+                    const name = stationNames[Math.floor(Math.random() * stationNames.length)];
+                    powerStationMarkers[name].powerOutput += 200;
+
+                    // Оновлюємо підказку
+                    updatePowerStationTooltip(name);
+
+                    return name;
+                }
+            }
+        };
+
+        const lineUpgrades = {
+            level: 0,
+            maxLevel: 3,
+            levels: ["Базові", "Укріплені", "Надійні", "Ідеальні"],
+            damageChances: [0.7, 0.55, 0.4, 0.25],
+            repairTimes: [1.0, 0.85, 0.7, 0.55],
+            costs: [0, 300, 500, 700],
+            colors: ['#888', '#007BFF', '#4CAF50', '#FFD700'],
+            weights: [2, 3, 4, 5],
+            autoRepair: {
+                unlocked: false,
+                active: false,
+                cost: 800,
+                repairSpeed: 0.5
+            }
+        };
+
+        // Функція для оновлення доходу в реальному часі
+        function updateIncomeRate() {
+            const { stats } = calculatePowerDistribution();
+            const currentSurplus = stats.totalProduction - stats.totalConsumption;
+
+            if (currentSurplus > 0) {
+                // Зменшуємо дохід у 5 разів (0.01 замість 0.05)
+                currentIncomeRate = Math.floor(currentSurplus * 0.01 * 60); // 1% від профіциту в секунду * 60
+            } else {
+                currentIncomeRate = 0;
+            }
+
+            document.getElementById("incomeRate").textContent = currentIncomeRate;
+        }
+
+        // Функція для оновлення балансу кожну секунду
+        function updateBalancePeriodically() {
+            if (currentIncomeRate > 0) {
+                // Додаємо ресурси (1/60 від хвилинного доходу за секунду)
+                energyResources += currentIncomeRate / 60;
+                updateResourceUI();
+            }
+        }
+
+        function buyLineUpgrade() {
+            if (lineUpgrades.level >= lineUpgrades.maxLevel) {
+                showWarning("Лінії вже максимально покращені!", false);
+                return;
+            }
+
+            const next = lineUpgrades.level + 1;
+            const cost = lineUpgrades.costs[next];
+
+            if (energyResources >= cost) {
+                energyResources -= cost;
+                lineUpgrades.level = next;
+                updateResourceUI();
+
+                lineLayers.forEach(conn => {
+                    conn.line.setStyle({
+                        color: lineUpgrades.colors[next],
+                        weight: lineUpgrades.weights[next]
+                    });
+                });
+
+                updateUpgradeButtons();
+                updateIncomeRate();
+                showWarning(`Лінії покращено до рівня "${lineUpgrades.levels[next]}"`, true);
+            } else {
+                showWarning(`Недостатньо ресурсів! Потрібно ${cost} МВт·год`, false);
+            }
+        }
+
+        function createTooltipContent(name, powerInfo) {
+            // Для електростанцій
+            if (powerStationMarkers[name]) {
+                const ps = powerStationMarkers[name];
+                return `<b>${name} (${ps.type})</b><div class="power-info">Потужність: ${ps.powerOutput} МВт</div>`;
+            }
+            // Для міст
+            return `<b>${name}</b><div class="power-info">${powerInfo}</div>`;
+        }
+
+        function updatePowerStationTooltip(stationName) {
+            const ps = powerStationMarkers[stationName];
+            if (!ps) return;
+
+            const newContent = createTooltipContent(
+                stationName,
+                `Потужність: ${ps.powerOutput} МВт`
+            );
+
+            // Оновлюємо підказку, якщо вона відкрита
+            const tooltip = ps.marker.getTooltip();
+            if (tooltip && tooltip.isOpen()) {
+                ps.marker.setTooltipContent(newContent);
+            }
+
+            // Оновлюємо вміст підказки для майбутніх відображень
+            ps.marker.unbindTooltip();
+            ps.marker.bindTooltip(newContent, {
+                permanent: false,
+                direction: 'top'
+            });
+        }
+
+        function blinkPowerStation(stationName) {
+            const ps = powerStationMarkers[stationName];
+            if (!ps) return;
+
+            // Оновлюємо підказку
+            updatePowerStationTooltip(stationName);
+
+            let blinkCount = 0;
+            const maxBlinks = 6;
+            const blinkInterval = 200;
+
+            const blinkIntervalId = setInterval(() => {
+                if (blinkCount >= maxBlinks) {
+                    clearInterval(blinkIntervalId);
+                    ps.marker.setStyle({
+                        color: '#43a047',
+                        fillColor: '#43a047'
+                    });
+                    return;
+                }
+
+                if (blinkCount % 2 === 0) {
+                    ps.marker.setStyle({
+                        color: '#ffeb3b',
+                        fillColor: '#ffeb3b'
+                    });
+                } else {
+                    ps.marker.setStyle({
+                        color: '#43a047',
+                        fillColor: '#43a047'
+                    });
+                }
+
+                blinkCount++;
+            }, blinkInterval);
+        }
+
+        function buyAutoRepair() {
+            if (!lineUpgrades.autoRepair.unlocked) {
+                if (energyResources >= lineUpgrades.autoRepair.cost) {
+                    energyResources -= lineUpgrades.autoRepair.cost;
+                    lineUpgrades.autoRepair.unlocked = true;
+                    lineUpgrades.autoRepair.active = true;
+                    updateResourceUI();
+                    updateUpgradeButtons();
+                    startAutoRepair();
+                    showWarning("Автоматичний ремонт активовано та увімкнено!", true);
+                } else {
+                    showWarning(`Недостатньо ресурсів! Потрібно ${lineUpgrades.autoRepair.cost} МВт·год`, false);
+                }
+            }
+            else {
+                lineUpgrades.autoRepair.active = !lineUpgrades.autoRepair.active;
+                updateUpgradeButtons();
+                if (lineUpgrades.autoRepair.active) {
+                    startAutoRepair();
+                    showWarning("Автоматичний ремонт увімкнено!", true);
+                } else {
+                    clearAllAutoRepairs();
+                    showWarning("Автоматичний ремонт вимкнено!", false);
+                }
+            }
+        }
+
+        function startAutoRepair() {
+            if (!lineUpgrades.autoRepair.unlocked || !lineUpgrades.autoRepair.active) return;
+
+            const damagedLines = lineLayers.filter(line => line.damaged);
+
+            if (repairTeams > 0 && damagedLines.length > 0) {
+                const lineToRepair = damagedLines[0];
+                repairTeams--;
+                updateTeamStatus();
+
+                const repairTime = repairTimes['line'] * lineUpgrades.autoRepair.repairSpeed *
+                    lineUpgrades.repairTimes[lineUpgrades.level];
+
+                showProgressBar(lineToRepair.damageMarker.getLatLng(), repairTime, () => {
+                    repairLine(lineToRepair);
+                    repairTeams++;
+                    updateTeamStatus();
+                    setTimeout(startAutoRepair, 0);
+                });
+            }
+        }
+
+        function clearAllAutoRepairs() {
+            lineLayers.forEach(line => {
+                if (line.repairTimer) {
+                    clearTimeout(line.repairTimer);
+                    line.repairTimer = null;
+                }
+            });
+        }
+
+        function updateUpgradeButtons() {
+            const lineBtn = document.getElementById('lineUpgradeBtn');
+            const autoRepairBtn = document.getElementById('autoRepairBtn');
+
+            if (lineBtn) {
+                const lvl = lineUpgrades.level;
+                const next = lvl + 1;
+
+                if (next <= lineUpgrades.maxLevel) {
+                    if (next <= lineUpgrades.maxLevel) {
+                        const cost = lineUpgrades.costs[next];
+                        const name = lineUpgrades.levels[next];
+                        const dmg = lineUpgrades.damageChances[next];
+                        const repair = lineUpgrades.repairTimes[next];
+                        lineBtn.innerHTML = `Покращити лінії (${cost} МВт·год)<br>
+                    → <b>${name}</b><br>
+                    Шанс пошкодження: <b>${Math.round(dmg * 100)}%</b><br>
+                    Час ремонту: <b>${Math.round((1 - repair) * 100)}% швидше</b>`;
+                        lineBtn.disabled = false;
+                    }
+                } else {
+                    lineBtn.innerHTML = `Лінії: ${lineUpgrades.levels[lvl]} (макс)`;
+                    lineBtn.disabled = true;
+                }
+            }
+
+            if (autoRepairBtn) {
+                if (!lineUpgrades.autoRepair.unlocked) {
+                    autoRepairBtn.innerHTML = `Автоматичний ремонт (${lineUpgrades.autoRepair.cost} МВт·год)`;
+                    autoRepairBtn.disabled = false;
+                } else {
+                    autoRepairBtn.innerHTML = lineUpgrades.autoRepair.active
+                        ? "🔴 Вимкнути авторемонт"
+                        : "🟢 Увімкнути авторемонт";
+                    autoRepairBtn.disabled = false;
+                }
+            }
+        }
+
+        function buildGraph() {
+            const graph = {};
+            Object.keys(cities).forEach(name => graph[name] = []);
+            Object.keys(powerStationMarkers).forEach(name => graph[name] = []);
+
+            for (const { from, to, damaged } of lineLayers) {
+                if (!damaged) {
+                    graph[from].push(to);
+                    graph[to].push(from);
+                }
+            }
+            return graph;
+        }
+
+        function showWarning(message, isGoodNews = false) {
+            const warning = document.createElement('div');
+            warning.className = `warning-message ${isGoodNews ? 'good-news' : 'bad-news'}`;
+            warning.textContent = message;
+            document.body.appendChild(warning);
+            setTimeout(() => warning.remove(), 4000);
+        }
+
+        function updateCityHealthIndicator(cityName, show) {
+            if (show) {
+                if (!cityHealthMarkers[cityName]) {
+                    const container = L.DomUtil.create('div', 'health-container');
+                    L.DomUtil.create('div', 'health-bar', container);
+
+                    const icon = L.divIcon({
+                        className: '',
+                        html: container.outerHTML,
+                        iconSize: [60, 6],
+                        iconAnchor: [30, 0]
+                    });
+
+                    const marker = L.marker(cities[cityName].coords, {
+                        icon,
+                        zIndexOffset: 1000
+                    }).addTo(map);
+
+                    cityHealthMarkers[cityName] = {
+                        marker
+                    };
+
+                    setTimeout(() => updateHealthBar(cityName, cityHealth[cityName].current), 0);
+                } else {
+                    cityHealthMarkers[cityName].marker.setOpacity(1);
+                }
+            } else if (cityHealthMarkers[cityName]) {
+                cityHealthMarkers[cityName].marker.setOpacity(0);
+            }
+        }
+
+        function updateHealthBar(cityName, percentage) {
+            const healthMarker = cityHealthMarkers[cityName];
+            if (healthMarker) {
+                const el = healthMarker.marker.getElement();
+                if (el) {
+                    const bar = el.querySelector('.health-bar');
+                    if (bar) {
+                        bar.style.width = `${percentage}%`;
+                    }
+                }
+            }
+        }
+
+        function startHealthDecrease(cityName) {
+            if (cityHealth[cityName].timer) return;
+
+            cityHealth[cityName].current = 100;
+            updateHealthBar(cityName, 100);
+
+            const decreaseInterval = 100;
+            const totalTime = 60000;
+            const steps = totalTime / decreaseInterval;
+            const decreasePerStep = 100 / steps;
+
+            cityHealth[cityName].timer = setInterval(() => {
+                cityHealth[cityName].current = Math.max(0, cityHealth[cityName].current - decreasePerStep);
+                updateHealthBar(cityName, cityHealth[cityName].current);
+
+                if (cityHealth[cityName].current <= 0) {
+                    clearInterval(cityHealth[cityName].timer);
+                    cityHealth[cityName].timer = null;
+                    disableCity(cityName);
+                    showWarning(`${cityName} втратив всі ресурси!`, false);
+                }
+            }, decreaseInterval);
+        }
+
+        function disableCity(cityName) {
+            const marker = cityMarkers[cityName];
+
+            const disabledLayer = L.divIcon({
+                className: 'city-disabled',
+                iconSize: [16, 16],
+                iconAnchor: [8, 8]
+            });
+
+            const disabledMarker = L.marker(cities[cityName].coords, {
+                icon: disabledLayer,
+                interactive: false,
+                zIndexOffset: -1
+            }).addTo(map);
+
+            cityDisabledLayers[cityName] = disabledMarker;
+
+            if (cityHealthMarkers[cityName]) {
+                cityHealthMarkers[cityName].marker.setOpacity(0);
+            }
+
+            marker.setStyle({
+                fillOpacity: 0,
+                opacity: 0
+            });
+            loseLife();
+        }
+
+        function enableCity(cityName) {
+            const marker = cityMarkers[cityName];
+
+            if (cityDisabledLayers[cityName]) {
+                map.removeLayer(cityDisabledLayers[cityName]);
+                delete cityDisabledLayers[cityName];
+            }
+
+            marker.setStyle({
+                fillOpacity: 1,
+                opacity: 1
+            });
+        }
+
+        function stopHealthDecrease(cityName) {
+            if (cityHealth[cityName].timer) {
+                clearInterval(cityHealth[cityName].timer);
+                cityHealth[cityName].timer = null;
+            }
+        }
+
+        function resetCityHealth(cityName) {
+            cityHealth[cityName].current = 100;
+            updateHealthBar(cityName, 100);
+            enableCity(cityName);
+        }
+
+        function createTooltipContent(name, powerInfo) {
+            return `<b>${name}</b><div class="power-info">${powerInfo}</div>`;
+        }
+
+        for (const [name, data] of Object.entries(cities)) {
+            const marker = L.circleMarker(data.coords, {
+                radius: 6,
+                color: '#4fc3f7',
+                fillColor: '#4fc3f7',
+                fillOpacity: 1,
+                opacity: 1,
+                zIndexOffset: 1000
+            }).addTo(map);
+
+            marker.bindTooltip(createTooltipContent(name, `Потреба: ${data.powerNeed} МВт`), {
+                permanent: false,
+                direction: 'top'
+            });
+
+            cityMarkers[name] = marker;
+            cityHealth[name] = { current: 100, timer: null, powered: true };
+        }
+
+        function showProgressBar(latlng, duration, onComplete) {
+            const container = L.DomUtil.create('div', 'progress-container');
+            L.DomUtil.create('div', 'progress-bar', container);
+
+            const icon = L.divIcon({
+                className: '',
+                html: container.outerHTML,
+                iconSize: [60, 8],
+                iconAnchor: [30, 0]
+            });
+
+            const marker = L.marker(latlng, { icon }).addTo(map);
+
+            let start = null;
+            function animate(timestamp) {
+                if (!start) start = timestamp;
+                const progress = (timestamp - start) / duration;
+
+                const el = marker.getElement();
+                if (el) {
+                    const barEl = el.querySelector('.progress-bar');
+                    if (barEl) {
+                        barEl.style.width = `${Math.min(progress * 100, 100)}%`;
+                    }
+                }
+
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    map.removeLayer(marker);
+                    onComplete();
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        powerStations.forEach((station) => {
+            const marker = L.circleMarker(station.coords, {
+                radius: 10,
+                color: '#43a047',
+                fillColor: '#43a047',
+                fillOpacity: 1,
+                zIndexOffset: 2000
+            }).addTo(map);
+
+            marker.bindTooltip(createTooltipContent(
+                `${station.name} (${station.type})`,
+                `Потужність: ${station.powerOutput} МВт`
+            ), { permanent: false, direction: 'top' });
+
+            powerStationMarkers[station.name] = {
+                marker,
+                fire: null,
+                damaged: false,
+                type: station.type,
+                powerOutput: station.powerOutput
+            };
+
+            marker.on('click', () => {
+                repairPowerStation(station.name);
+                // Оновлюємо підказку після ремонту
+                updatePowerStationTooltip(station.name);
+            });
+        });
+
+        function repairPowerStation(name) {
+            const ps = powerStationMarkers[name];
+            if (!ps.damaged) return;
+
+            if (repairTeams <= 0) {
+                showWarning("Недостатньо бригад! Зачекайте, поки звільниться хоча б одна.", false);
+                return;
+            }
+
+            repairTeams--;
+            updateTeamStatus();
+
+            showProgressBar(ps.marker.getLatLng(), repairTimes[ps.type] * difficultyMultiplier, () => {
+                ps.damaged = false;
+                if (ps.fire) {
+                    map.removeLayer(ps.fire);
+                    ps.fire = null;
+                }
+                ps.marker.setStyle({
+                    color: '#43a047',
+                    fillColor: '#43a047'
+                });
+                repairTeams++;
+                updateTeamStatus();
+                updateCityPowerStatus();
+                updateIncomeRate(); // Оновлюємо дохід після ремонту
+            });
+        }
+
+        function repairLine(line) {
+            if (!line.damaged) return;
+
+            line.damaged = false;
+            line.line.setStyle({
+                color: lineUpgrades.colors[lineUpgrades.level],
+                weight: lineUpgrades.weights[lineUpgrades.level]
+            });
+            line.damageMarker.setOpacity(0);
+
+            if (line.repairTimer) {
+                clearTimeout(line.repairTimer);
+                line.repairTimer = null;
+            }
+
+            updateCityPowerStatus();
+            updateIncomeRate(); // Оновлюємо дохід після ремонту
+        }
+
+        function midpoint(coord1, coord2) {
+            return [(coord1[0] + coord2[0]) / 2, (coord1[1] + coord2[1]) / 2];
+        }
+
+        function hasPath(graph, start, goal) {
+            if (start === goal) return true;
+            const visited = new Set();
+            const queue = [start];
+            while (queue.length) {
+                const node = queue.shift();
+                if (node === goal) return true;
+                visited.add(node);
+                for (const neighbor of graph[node] || []) {
+                    if (!visited.has(neighbor)) queue.push(neighbor);
+                }
+            }
+            return false;
+        }
+
+        function updateTeamStatus() {
+            const teamElement = document.createElement('div');
+            teamElement.id = 'teamsStatus';
+            teamElement.innerHTML = `Ремонтні бригади: <span style="color:${repairTeams > 0 ? 'green' : 'red'}">${repairTeams}</span>`;
+
+            const statusPanel = document.getElementById('statusPanel');
+            const existingTeamElement = document.getElementById('teamsStatus');
+
+            if (existingTeamElement) {
+                statusPanel.replaceChild(teamElement, existingTeamElement);
+            } else {
+                statusPanel.appendChild(teamElement);
+            }
+        }
+
+        function calculatePowerDistribution() {
+            const graph = buildGraph();
+
+            const workingStations = Object.entries(powerStationMarkers)
+                .filter(([_, ps]) => !ps.damaged)
+                .map(([name, ps]) => ({
+                    name,
+                    powerOutput: ps.powerOutput,
+                    remainingPower: ps.powerOutput,
+                    cities: []
+                }));
+
+            workingStations.sort((a, b) => b.powerOutput - a.powerOutput);
+
+            const result = {};
+            const poweredCities = new Set();
+
+            for (const station of workingStations) {
+                const reachableCities = Object.keys(cities).filter(city =>
+                    !poweredCities.has(city) && hasPath(graph, city, station.name)
+                );
+
+                reachableCities.sort((a, b) => {
+                    const distA = getDistance(cities[a].coords, powerStationMarkers[station.name].marker.getLatLng());
+                    const distB = getDistance(cities[b].coords, powerStationMarkers[station.name].marker.getLatLng());
+                    return distA - distB;
+                });
+
+                for (const city of reachableCities) {
+                    if (station.remainingPower >= cities[city].powerNeed) {
+                        station.cities.push(city);
+                        station.remainingPower -= cities[city].powerNeed;
+                        poweredCities.add(city);
+                        result[city] = true;
+                    }
+                }
+            }
+
+            const totalProduction = workingStations.reduce((sum, s) => sum + s.powerOutput, 0);
+            const totalConsumption = Object.values(cities).reduce((sum, c) => sum + c.powerNeed, 0);
+            const poweredConsumption = workingStations.reduce((sum, s) => sum + (s.powerOutput - s.remainingPower), 0);
+
+            return {
+                distribution: result,
+                stats: { totalProduction, totalConsumption, poweredConsumption }
+            };
+        }
+
+        function getDistance(latLng1, latLng2) {
+            const R = 6371;
+            const dLat = (latLng2[0] - latLng1[0]) * Math.PI / 180;
+            const dLon = (latLng2[1] - latLng1[1]) * Math.PI / 180;
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(latLng1[0] * Math.PI / 180) * Math.cos(latLng2[0] * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        }
+
+        function updateStatusPanel(poweredCities, totalCities, stats) {
+            const psStats = { 'ГЕС': [0, 0], 'АЕС': [0, 0], 'ТЕС': [0, 0], 'ВЕС': [0, 0] };
+            for (const { name, type } of powerStations) {
+                const ps = powerStationMarkers[name];
+                if (ps.damaged) psStats[type][1]++;
+                else psStats[type][0]++;
+            }
+
+            let workingLines = 0, damagedLines = 0;
+            for (const conn of lineLayers) {
+                if (conn.damaged) damagedLines++;
+                else workingLines++;
+            }
+
+            const color = (good, total) => {
+                const damaged = total - good;
+                return `<span style="color:red;">${damaged}</span> / <span style="color:green;">${total}</span>`;
+            };
+
+            const statusHTML = `
+        <div><strong>Міста зі світлом:</strong> ${poweredCities} з ${totalCities}</div>
+        <div><strong>ГЕС:</strong> ${color(psStats['ГЕС'][0], psStats['ГЕС'][0] + psStats['ГЕС'][1])}</div>
+        <div><strong>АЕС:</strong> ${color(psStats['АЕС'][0], psStats['АЕС'][0] + psStats['АЕС'][1])}</div>
+        <div><strong>ТЕС:</strong> ${color(psStats['ТЕС'][0], psStats['ТЕС'][0] + psStats['ТЕС'][1])}</div>
+        <div><strong>ВЕС:</strong> ${color(psStats['ВЕС'][0], psStats['ВЕС'][0] + psStats['ВЕС'][1])}</div>
+        <div><strong>Лінії:</strong> ${color(workingLines, workingLines + damagedLines)}</div>
+        <div><strong>Виробництво:</strong> ${Math.round(stats.totalProduction)} МВт</div>
+        <div><strong>Споживання:</strong> ${Math.round(stats.totalConsumption)} МВт</div>
+        <div><strong>Поточний баланс:</strong> ${Math.round(stats.totalProduction - stats.totalConsumption)} МВт</div>
+        <div><strong>Дефіцит:</strong> ${Math.round(stats.poweredConsumption - stats.totalConsumption)} МВт</div>
+        <div id="teamsStatus"></div>
+    `;
+
+            document.getElementById('statusPanel').innerHTML = statusHTML;
+            updateTeamStatus();
+        }
+
+        function updateResourceUI() {
+            document.getElementById("energyResources").textContent = Math.floor(energyResources);
+        }
+
+        function buyUpgrade(type) {
+            const upgrade = upgrades[type];
+            if (energyResources >= upgrade.cost) {
+                energyResources -= upgrade.cost;
+                updateResourceUI();
+
+                const result = upgrade.effect();
+
+                if (type === 'powerPlant' && result) {
+                    const ps = powerStationMarkers[result];
+                    showWarning(`${ps.type} "${result}" покращено! +200 МВт`, true);
+                    blinkPowerStation(result);
+                } else {
+                    showWarning(`Апгрейд "${type}" куплено! Витрачено ${upgrade.cost} МВт·год`, true);
+                }
+
+                updateCityPowerStatus();
+                updateIncomeRate();
+            } else {
+                showWarning(`Недостатньо ресурсів! Потрібно ${upgrade.cost} МВт·год`, false);
+            }
+        }
+
+        function updateCityPowerStatus() {
+            const { distribution, stats } = calculatePowerDistribution();
+            updateIncomeRate(); // Оновлюємо дохід при зміні статусу міст
+
+            for (const [city, marker] of Object.entries(cityMarkers)) {
+                const powered = distribution[city] || false;
+                const wasPowered = cityHealth[city].powered;
+                cityHealth[city].powered = powered;
+
+                if (wasPowered !== powered) {
+                    if (powered) {
+                        stopHealthDecrease(city);
+                        resetCityHealth(city);
+                        updateCityHealthIndicator(city, false);
+                        marker.setStyle({
+                            fillColor: '#4fc3f7',
+                            color: '#4fc3f7'
+                        });
+                    } else {
+                        resetCityHealth(city);
+                        updateCityHealthIndicator(city, true);
+                        startHealthDecrease(city);
+                        marker.setStyle({
+                            fillColor: 'black',
+                            color: 'black'
+                        });
+                    }
+                }
+            }
+
+            const poweredCount = Object.values(distribution).filter(v => v).length;
+            updateStatusPanel(poweredCount, Object.keys(cityMarkers).length, stats);
+            updateIncomeRate();
+        }
+
+        connections.forEach(([from, to]) => {
+            const latlngs = [
+                cities[from]?.coords || powerStations.find(p => p.name === from)?.coords,
+                cities[to]?.coords || powerStations.find(p => p.name === to)?.coords
+            ];
+
+            const line = L.polyline(latlngs, {
+                color: lineUpgrades.colors[lineUpgrades.level],
+                weight: lineUpgrades.weights[lineUpgrades.level]
+            }).addTo(map).bringToBack();
+
+            const damageMarker = L.marker(midpoint(latlngs[0], latlngs[1]), {
+                icon: L.divIcon({
+                    className: 'damage-icon',
+                    html: '<span style="font-size:24px;line-height:24px;">⚡</span>',
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                }),
+                zIndexOffset: 0
+            }).addTo(map).setOpacity(0);
+
+            const conn = {
+                from,
+                to,
+                line,
+                damaged: false,
+                damageMarker,
+                repairTimer: null
+            };
+            lineLayers.push(conn);
+
+            damageMarker.on('click', () => {
+                if (!conn.damaged || repairTeams <= 0) return;
+
+                if (lineUpgrades.autoRepair.unlocked && conn.repairTimer) {
+                    showWarning("Автоматичний ремонт вже виконує цю роботу!", false);
+                    return;
+                }
+
+                repairTeams--;
+                updateTeamStatus();
+
+                if (conn.repairTimer) {
+                    clearTimeout(conn.repairTimer);
+                    conn.repairTimer = null;
+                }
+
+                const repairTime = repairTimes['line'] * difficultyMultiplier *
+                    lineUpgrades.repairTimes[lineUpgrades.level];
+
+                showProgressBar(damageMarker.getLatLng(), repairTime, () => {
+
+                    repairLine(conn);
+                    repairTeams++;
+                    updateTeamStatus();
+
+                    if (lineUpgrades.autoRepair.unlocked) {
+                        startAutoRepair();
+                    }
+                });
+            });
+        });
+
+        function simulateAttack() {
+            if (!isGameRunning) return;
+
+            let attackExecuted = false;
+            const now = Date.now();
+
+            if (Math.random() < 0.7) {
+                const workingLines = lineLayers.filter(line => !line.damaged);
+                if (workingLines.length > 0) {
+                    const randomLine = workingLines[Math.floor(Math.random() * workingLines.length)];
+
+                    const dmgChance = lineUpgrades.damageChances[lineUpgrades.level];
+                    if (Math.random() < dmgChance) {
+                        randomLine.damaged = true;
+                        randomLine.line.setStyle({ color: '#ff0000' });
+                        randomLine.damageMarker.setOpacity(1);
+                        attackExecuted = true;
+
+                        if (lineUpgrades.autoRepair.unlocked && lineUpgrades.autoRepair.active) {
+                            if (repairTeams > 0 && !randomLine.repairInProgress) {
+                                randomLine.repairInProgress = true;
+                                repairTeams--;
+                                updateTeamStatus();
+
+                                const repairTime = repairTimes['line'] *
+                                    lineUpgrades.autoRepair.repairSpeed *
+                                    lineUpgrades.repairTimes[lineUpgrades.level];
+
+                                showProgressBar(
+                                    randomLine.damageMarker.getLatLng(),
+                                    repairTime,
+                                    () => {
+                                        if (randomLine.damaged) {
+                                            repairLine(randomLine);
+                                        }
+                                        randomLine.repairInProgress = false;
+                                        repairTeams++;
+                                        updateTeamStatus();
+                                    }
+                                );
+                            } else if (repairTeams <= 0) {
+                                randomLine.repairTimer = setTimeout(() => {
+                                    if (randomLine.damaged && lineUpgrades.autoRepair.active) {
+                                        repairLine(randomLine);
+                                    }
+                                }, 2000);
+                            }
+                        }
+                    } else {
+                        showWarning("Атака відбита! Міцні лінії витримали удар.", true);
+                    }
+                }
+            }
+
+            if (!attackExecuted && Math.random() < 0.3) {
+                const workingStations = Object.values(powerStationMarkers)
+                    .filter(ps => !ps.damaged && ps.type === 'ТЕС');
+
+                if (workingStations.length > 0) {
+                    const randomStation = workingStations[Math.floor(Math.random() * workingStations.length)];
+                    randomStation.damaged = true;
+                    randomStation.fire = L.marker(randomStation.marker.getLatLng(), {
+                        icon: L.divIcon({
+                            className: 'fire-icon',
+                            html: '<span style="font-size:20px;line-height:20px;">🔥</span>',
+                            iconSize: [20, 20],
+                            iconAnchor: [10, 20]
+                        }),
+                        zIndexOffset: 2001
+                    }).addTo(map);
+                    randomStation.marker.setStyle({
+                        color: '#e57373',
+                        fillColor: '#e57373'
+                    });
+                    attackExecuted = true;
+                }
+            }
+
+            if (attackExecuted) {
+                updateCityPowerStatus();
+
+                if (lineUpgrades.autoRepair.unlocked && lineUpgrades.autoRepair.active) {
+                    setTimeout(() => {
+                        const damagedLines = lineLayers.filter(line =>
+                            line.damaged &&
+                            !line.repairInProgress &&
+                            !line.repairTimer
+                        );
+
+                        if (damagedLines.length > 0 && repairTeams > 0) {
+                            const lineToRepair = damagedLines[0];
+                            lineToRepair.repairInProgress = true;
+                            repairTeams--;
+                            updateTeamStatus();
+
+                            const repairTime = repairTimes['line'] *
+                                lineUpgrades.autoRepair.repairSpeed *
+                                lineUpgrades.repairTimes[lineUpgrades.level];
+
+                            showProgressBar(
+                                lineToRepair.damageMarker.getLatLng(),
+                                repairTime,
+                                () => {
+                                    repairLine(lineToRepair);
+                                    repairTeams++;
+                                    updateTeamStatus();
+                                }
+                            );
+                        }
+                    }, 1500);
+                }
+            }
+
+            difficultyMultiplier = Math.min(2, 0.7 + (now - gameStartTime) / 1800000);
+            scheduleNextAttack();
+        }
+
+        function scheduleNextAttack() {
+            const now = Date.now();
+            const timeSinceLast = now - lastAttackTime;
+            const timeSinceStart = (now - gameStartTime) / 60000;
+
+            if (timeSinceStart < 0.083) {
+                setTimeout(() => {
+                    simulateAttack();
+                    lastAttackTime = Date.now();
+                }, 2000);
+                return;
+            }
+
+            const baseDelay = Math.max(5000, 15000 - timeSinceStart * 300);
+            const dynamicDelay = Math.min(20000, Math.max(3000, baseDelay));
+
+            setTimeout(() => {
+                simulateAttack();
+                lastAttackTime = Date.now();
+                difficultyMultiplier = Math.min(2, 0.7 + timeSinceStart / 30);
+            }, dynamicDelay);
+        }
+
+        // Функція оновлення відображення життів
+        function updateLivesDisplay() {
+            const lifeElements = document.querySelectorAll('.life');
+            lifeElements.forEach((el, index) => {
+                el.style.display = index < lives ? 'inline-block' : 'none';
+            });
+        }
+
+        // Функція втрати життя
+        function loseLife() {
+            if (isGameOver) return;
+
+            lives--;
+            updateLivesDisplay();
+
+            if (lives <= 0) {
+                endGame();
+            } else {
+                showWarning("Ви втратили одне життя!", false);
+            }
+        }
+
+        // Функція завершення гри
+        function endGame() {
+            isGameOver = true;
+            document.getElementById('game-over').style.display = 'flex';
+            clearInterval(balanceUpdateInterval);
+            clearTimeout(attackTimeout);
+        }
+
+        // Функція рестарту гри
+        function restartGame() {
+            document.getElementById('game-over').style.opacity = '0';
+            setTimeout(() => location.reload(), 500);
+        }
+
+        document.getElementById('restart-button').addEventListener('click', restartGame);
+
+        document.getElementById('toggleUpgradesPanel').addEventListener('click', function () {
+            const panel = document.getElementById('upgradesPanel');
+            panel.classList.toggle('collapsed');
+            this.textContent = panel.classList.contains('collapsed') ? '⚙️' : '✕';
+            this.style.right = panel.classList.contains('collapsed') ? '10px' : '320px';
+        });
+
+        document.getElementById('toggleStatusPanel').addEventListener('click', function () {
+            const panel = document.getElementById('statusPanel');
+            panel.classList.toggle('collapsed');
+            this.textContent = panel.classList.contains('collapsed') ? 'ℹ️' : '✕';
+            this.style.left = panel.classList.contains('collapsed') ? '10px' : '320px';
+        });
+
+        // Ініціалізація при завантаженні
+        document.addEventListener('DOMContentLoaded', function () {
+            const upgradesPanel = document.getElementById('upgradesPanel');
+            const statusPanel = document.getElementById('statusPanel');
+            const toggleUpgrades = document.getElementById('toggleUpgradesPanel');
+            const toggleStatus = document.getElementById('toggleStatusPanel');
+
+            // Початковий стан - сховано
+            upgradesPanel.classList.add('collapsed');
+            statusPanel.classList.add('collapsed');
+
+            // Позиціонуємо кнопки
+            toggleUpgrades.style.right = '10px';
+            toggleStatus.style.left = '10px';
+
+            // Інші ініціалізації...
+            updateTeamStatus();
+            updateCityPowerStatus();
+            updateUpgradeButtons();
+            updateIncomeRate();
+            balanceUpdateInterval = setInterval(updateBalancePeriodically, 1000);
+            scheduleNextAttack();
+            updateLivesDisplay();
+        });
+    </script>
+</body>
+
+</html>
