@@ -84,20 +84,29 @@
             z-index: 1001;
             animation: highlight 0.5s ease 2;
             animation-delay: 1s;
+            background: rgba(40, 40, 40, 0.95);
+            border-left: 4px solid;
+            padding: 12px 20px;
+            font-size: 15px;
+            backdrop-filter: blur(2px);
         }
 
         .warning-message.good-news {
-            background: rgba(76, 175, 80, 0.9);
+            /* background: rgba(76, 175, 80, 0.9); */
             /* Зелений колір */
             animation: highlight-green 0.5s ease 2;
             animation-delay: 1s;
+            border-color: #4CAF50;
+            color: #C8E6C9;
         }
 
         .warning-message.bad-news {
-            background: rgba(255, 87, 34, 0.9);
+            /* background: rgba(255, 87, 34, 0.9); */
             /* Поточний помаранчевий */
             animation: highlight 0.5s ease 2;
             animation-delay: 1s;
+            border-color: #F44336;
+            color: #FFCDD2;
         }
 
         @keyframes highlight-green {
@@ -158,6 +167,111 @@
             margin-top: 3px;
         }
 
+        .resource-panel {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 12px 15px;
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            color: white;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .resource-icon {
+            font-size: 24px;
+            color: #FFEB3B;
+        }
+
+        .resource-values {
+            line-height: 1.3;
+        }
+
+        .resource-amount {
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .income-rate {
+            font-size: 14px;
+            color: #81C784;
+        }
+
+        .upgrade-btn {
+            /* Основний стиль для всіх кнопок */
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 12px;
+            background: linear-gradient(to right, #2C3E50, #4CA1AF);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .upgrade-btn:enabled {
+            background: linear-gradient(to right, #1E3C72, #2A5298);
+            color: #FFF;
+            border-left: 4px solid #FFD700;
+        }
+
+        .upgrade-btn:enabled:hover {
+            background: linear-gradient(to right, #2A5298, #1E3C72);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .upgrade-btn:disabled {
+            opacity: 0.6;
+            background: linear-gradient(to right, #3a3a3a, #4a4a4a) !important;
+            cursor: not-allowed;
+        }
+
+        .upgrade-btn:disabled .upgrade-cost {
+            background: rgba(255, 0, 0, 0.3) !important;
+        }
+
+        .upgrade-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .upgrade-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .upgrade-icon {
+            font-size: 20px;
+            margin-right: 8px;
+        }
+
+        .upgrade-title {
+            font-weight: bold;
+            flex-grow: 1;
+        }
+
+        .upgrade-cost {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .upgrade-effect {
+            font-size: 13px;
+            color: #B2EBF2;
+            padding-left: 28px;
+        }
+
         #upgradesPanel {
             position: absolute;
             top: 10px;
@@ -173,7 +287,7 @@
             width: 300px;
         }
 
-        #upgradesPanel button {
+        #upgradesPanel button:not(.upgrade-btn) {
             display: block;
             width: 100%;
             margin: 8px 0;
@@ -186,12 +300,12 @@
             transition: background 0.2s;
         }
 
-        #upgradesPanel button:disabled {
+        #upgradesPanel button:not(.upgrade-btn):disabled {
             opacity: 0.6;
             cursor: not-allowed;
         }
 
-        #upgradesPanel button:hover {
+        #upgradesPanel button:not(.upgrade-btn):hover {
             background: #e8e8e8;
         }
 
@@ -244,6 +358,59 @@
         #upgradesPanel.collapsed {
             transform: translateX(calc(100% + 10px));
             /* Додаємо ще 10px за межі екрану */
+        }
+
+        #statusPanel {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            width: 320px;
+
+            background: rgba(0, 0, 0, 0.8);
+            /* темніший фон */
+            border-left: 4px solid #2196F3;
+            /* синя енергетична смуга */
+            border-radius: 12px;
+            padding: 16px 18px;
+
+            font-family: 'Arial', sans-serif;
+            font-size: 14px;
+            color: #f1f1f1;
+            line-height: 1.5;
+
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(5px);
+            /* легке розмиття фону */
+            z-index: 1000;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* Заголовки / ключові слова */
+        #statusPanel strong {
+            color: #FFD700;
+            /* золотистий акцент */
+            font-weight: bold;
+        }
+
+        /* Кожен рядок як "статистика" */
+        #statusPanel div {
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        #statusPanel div:last-child {
+            border-bottom: none;
+        }
+
+        /* Цифри у кольорах */
+        #statusPanel span[style*="color:green"] {
+            color: #81C784 !important;
+            font-weight: bold;
+        }
+
+        #statusPanel span[style*="color:red"] {
+            color: #E57373 !important;
+            font-weight: bold;
         }
 
         #statusPanel.collapsed {
@@ -311,31 +478,51 @@
     <div id="map"></div>
     <div id="toggleUpgradesPanel" class="panel-toggle">⚙️</div>
     <div id="toggleStatusPanel" class="panel-toggle">ℹ️</div>
-    <div id="statusPanel" style="
-        position: absolute;
-        bottom: 10px;
-        left: 10px;
-        background: rgba(255, 255, 255, 0.9);
-        padding: 10px 14px;
-        border-radius: 10px;
-        font-family: sans-serif;
-        font-size: 14px;
-        box-shadow: 0 0 8px rgba(0,0,0,0.2);
-        z-index: 1000;
-        line-height: 1.4;
-        width: 300px;
-    "></div>
+    <div id="statusPanel"></div>
 
     <div id="upgradesPanel">
-        <h3 style="margin-top: 0;">Ресурси: <span id="energyResources">0</span> МВт·год (<span id="incomeRate">0</span>
-            МВт/хв)</h3>
-        <button onclick="buyUpgrade('team')">+1 Бригада (100 МВт·год) → +50 МВт витрат</button>
-        <button onclick="buyUpgrade('powerPlant')">Покращити випадкову станцію (300 МВт·год) → +200 МВт</button>
-        <button onclick="buyLineUpgrade()" id="lineUpgradeBtn">
-            Покращити лінії (200 МВт·год) → Рівень 1/3
+        <div class="resource-panel">
+            <div class="resource-icon">⚡</div>
+            <div class="resource-values">
+                <div class="resource-amount"><span id="energyResources">0</span> МВт·год</div>
+                <div class="income-rate">+<span id="incomeRate">0</span> МВт/хв</div>
+            </div>
+        </div>
+
+        <button class="upgrade-btn" onclick="buyUpgrade('team')">
+            <div class="upgrade-header">
+                <span class="upgrade-icon">👷</span>
+                <span class="upgrade-title">+1 Бригада</span>
+                <span class="upgrade-cost">100 МВт·год</span>
+            </div>
+            <div class="upgrade-effect">+50 МВт витрат</div>
         </button>
-        <button onclick="buyAutoRepair()" id="autoRepairBtn">
-            Автоматичний ремонт (800 МВт·год)
+
+        <button class="upgrade-btn" onclick="buyUpgrade('powerPlant')">
+            <div class="upgrade-header">
+                <span class="upgrade-icon">🏭</span>
+                <span class="upgrade-title">Покращити станцію</span>
+                <span class="upgrade-cost">300 МВт·год</span>
+            </div>
+            <div class="upgrade-effect">+200 МВт потужності</div>
+        </button>
+
+        <button class="upgrade-btn" onclick="buyLineUpgrade()" id="lineUpgradeBtn">
+            <div class="upgrade-header">
+                <span class="upgrade-icon">🔌</span>
+                <span class="upgrade-title">Покращити лінії</span>
+                <span class="upgrade-cost" id="lineUpgradeCost">200 МВт·год</span>
+            </div>
+            <div class="upgrade-effect" id="lineUpgradeEffect">Рівень 1/3</div>
+        </button>
+
+        <button class="upgrade-btn" onclick="buyAutoRepair()" id="autoRepairBtn">
+            <div class="upgrade-header">
+                <span class="upgrade-icon">🤖</span>
+                <span class="upgrade-title">Автоматичний ремонт</span>
+                <span class="upgrade-cost">800 МВт·год</span>
+            </div>
+            <div class="upgrade-effect">Швидкість ремонту +50%</div>
         </button>
     </div>
 
@@ -436,7 +623,7 @@
         const cityHealth = {};
         const cityHealthMarkers = {};
         const cityDisabledLayers = {};
-        let repairTeams = 3;
+        let repairTeams = 1;
         let difficultyMultiplier = 1;
         let lastAttackTime = Date.now();
         let gameStartTime = Date.now();
@@ -530,6 +717,7 @@
                 // Додаємо ресурси (1/60 від хвилинного доходу за секунду)
                 energyResources += currentIncomeRate / 60;
                 updateResourceUI();
+                updateUpgradeButtons();
             }
         }
 
@@ -691,42 +879,47 @@
         }
 
         function updateUpgradeButtons() {
+            // Оновлення кнопки покращення ліній
             const lineBtn = document.getElementById('lineUpgradeBtn');
+            const lvl = lineUpgrades.level;
+            const next = lvl + 1;
+
+            if (next <= lineUpgrades.maxLevel) {
+                const cost = lineUpgrades.costs[next];
+                lineBtn.querySelector('.upgrade-cost').textContent = `${cost} МВт·год`;
+                lineBtn.querySelector('.upgrade-effect').innerHTML = `
+            <span style="color:#81C784">${lineUpgrades.levels[next]}</span><br>
+            Шанс пошкодження: <b>${Math.round(lineUpgrades.damageChances[next] * 100)}%</b><br>
+            Час ремонту: <b>${Math.round((1 - lineUpgrades.repairTimes[next]) * 100)}% швидше</b>
+        `;
+                lineBtn.disabled = energyResources < cost;
+            } else {
+                lineBtn.querySelector('.upgrade-effect').innerHTML = `
+            <span style="color:#FFD700">${lineUpgrades.levels[lvl]} (макс)</span>
+        `;
+                lineBtn.disabled = true;
+            }
+
+            // Оновлення кнопки авторемонту
             const autoRepairBtn = document.getElementById('autoRepairBtn');
-
-            if (lineBtn) {
-                const lvl = lineUpgrades.level;
-                const next = lvl + 1;
-
-                if (next <= lineUpgrades.maxLevel) {
-                    if (next <= lineUpgrades.maxLevel) {
-                        const cost = lineUpgrades.costs[next];
-                        const name = lineUpgrades.levels[next];
-                        const dmg = lineUpgrades.damageChances[next];
-                        const repair = lineUpgrades.repairTimes[next];
-                        lineBtn.innerHTML = `Покращити лінії (${cost} МВт·год)<br>
-                    → <b>${name}</b><br>
-                    Шанс пошкодження: <b>${Math.round(dmg * 100)}%</b><br>
-                    Час ремонту: <b>${Math.round((1 - repair) * 100)}% швидше</b>`;
-                        lineBtn.disabled = false;
-                    }
-                } else {
-                    lineBtn.innerHTML = `Лінії: ${lineUpgrades.levels[lvl]} (макс)`;
-                    lineBtn.disabled = true;
-                }
+            if (!lineUpgrades.autoRepair.unlocked) {
+                autoRepairBtn.querySelector('.upgrade-cost').textContent = `${lineUpgrades.autoRepair.cost} МВт·год`;
+                autoRepairBtn.disabled = energyResources < lineUpgrades.autoRepair.cost;
+            } else {
+                autoRepairBtn.querySelector('.upgrade-title').innerHTML = lineUpgrades.autoRepair.active ?
+                    '<span style="color:#EF5350">Вимкнути авторемонт</span>' :
+                    '<span style="color:#66BB6A">Увімкнути авторемонт</span>';
+                autoRepairBtn.querySelector('.upgrade-icon').textContent = lineUpgrades.autoRepair.active ? '⏸️' : '▶️';
+                autoRepairBtn.disabled = false;
             }
 
-            if (autoRepairBtn) {
-                if (!lineUpgrades.autoRepair.unlocked) {
-                    autoRepairBtn.innerHTML = `Автоматичний ремонт (${lineUpgrades.autoRepair.cost} МВт·год)`;
-                    autoRepairBtn.disabled = false;
-                } else {
-                    autoRepairBtn.innerHTML = lineUpgrades.autoRepair.active
-                        ? "🔴 Вимкнути авторемонт"
-                        : "🟢 Увімкнути авторемонт";
-                    autoRepairBtn.disabled = false;
+            // Оновлення інших кнопок
+            document.querySelectorAll('.upgrade-btn').forEach(btn => {
+                if (!btn.id || (btn.id !== 'lineUpgradeBtn' && btn.id !== 'autoRepairBtn')) {
+                    const cost = parseInt(btn.querySelector('.upgrade-cost').textContent);
+                    btn.disabled = energyResources < cost;
                 }
-            }
+            });
         }
 
         function buildGraph() {
@@ -1123,19 +1316,20 @@
                 return `<span style="color:red;">${damaged}</span> / <span style="color:green;">${total}</span>`;
             };
 
+            const deficit = Math.round(stats.poweredConsumption - stats.totalConsumption);
+
             const statusHTML = `
-        <div><strong>Міста зі світлом:</strong> ${poweredCities} з ${totalCities}</div>
-        <div><strong>ГЕС:</strong> ${color(psStats['ГЕС'][0], psStats['ГЕС'][0] + psStats['ГЕС'][1])}</div>
-        <div><strong>АЕС:</strong> ${color(psStats['АЕС'][0], psStats['АЕС'][0] + psStats['АЕС'][1])}</div>
-        <div><strong>ТЕС:</strong> ${color(psStats['ТЕС'][0], psStats['ТЕС'][0] + psStats['ТЕС'][1])}</div>
-        <div><strong>ВЕС:</strong> ${color(psStats['ВЕС'][0], psStats['ВЕС'][0] + psStats['ВЕС'][1])}</div>
-        <div><strong>Лінії:</strong> ${color(workingLines, workingLines + damagedLines)}</div>
-        <div><strong>Виробництво:</strong> ${Math.round(stats.totalProduction)} МВт</div>
-        <div><strong>Споживання:</strong> ${Math.round(stats.totalConsumption)} МВт</div>
-        <div><strong>Поточний баланс:</strong> ${Math.round(stats.totalProduction - stats.totalConsumption)} МВт</div>
-        <div><strong>Дефіцит:</strong> ${Math.round(stats.poweredConsumption - stats.totalConsumption)} МВт</div>
-        <div id="teamsStatus"></div>
-    `;
+  <div><strong>Міста зі світлом:</strong> ${poweredCities} з ${totalCities}</div>
+  <div><strong>ГЕС:</strong> ${color(psStats['ГЕС'][0], psStats['ГЕС'][0] + psStats['ГЕС'][1])}</div>
+  <div><strong>АЕС:</strong> ${color(psStats['АЕС'][0], psStats['АЕС'][0] + psStats['АЕС'][1])}</div>
+  <div><strong>ТЕС:</strong> ${color(psStats['ТЕС'][0], psStats['ТЕС'][0] + psStats['ТЕС'][1])}</div>
+  <div><strong>ВЕС:</strong> ${color(psStats['ВЕС'][0], psStats['ВЕС'][0] + psStats['ВЕС'][1])}</div>
+  <div><strong>Лінії:</strong> ${color(workingLines, workingLines + damagedLines)}</div>
+  <div><strong>Виробництво:</strong> ${Math.round(stats.totalProduction)} МВт</div>
+  <div><strong>Споживання:</strong> ${Math.round(stats.totalConsumption)} МВт</div>
+  <div><strong>Дефіцит(для міст):</strong> ${deficit} МВт</div>
+  <div id="teamsStatus"></div>
+`;
 
             document.getElementById('statusPanel').innerHTML = statusHTML;
             updateTeamStatus();
