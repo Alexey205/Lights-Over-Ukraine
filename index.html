@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lights Over Ukraine - Стратегічна гра про енергосистему України</title>
+    <link rel="icon" href="src/icon.png" type="image/png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='7' cy='7' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .hero-content {
+            z-index: 2;
+            position: relative;
+            max-width: 800px;
+            padding: 2rem;
+        }
+
+        .logo {
+            width: 128px;
+            height: 128px;
+            margin: 0 auto 2rem;
+            background: linear-gradient(45deg, #3b82f6, #06b6d4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 20px 40px rgba(59, 130, 246, 0.3); }
+            50% { transform: scale(1.05); box-shadow: 0 25px 50px rgba(59, 130, 246, 0.5); }
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #3b82f6, #06b6d4, #8b5cf6);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: brightness(1); }
+            to { filter: brightness(1.2); }
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 3rem;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        .play-button {
+            display: inline-block;
+            background: linear-gradient(45deg, #059669, #10b981);
+            color: white;
+            text-decoration: none;
+            padding: 1rem 3rem;
+            border-radius: 50px;
+            font-size: 1.25rem;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .play-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.6);
+            background: linear-gradient(45deg, #10b981, #059669);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 3rem;
+            background: linear-gradient(45deg, #f59e0b, #f97316);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: rgba(15, 23, 42, 0.8);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        .feature-card:hover::before {
+            left: 100%;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #3b82f6;
+        }
+
+        /* Statistics Section */
+        .stats {
+            background: rgba(15, 23, 42, 0.9);
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .stats h2 {
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #06b6d4;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .stat-card {
+            padding: 2rem;
+            background: linear-gradient(145deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #10b981;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+        }
+
+        /* Upgrades Section */
+        .upgrades {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .upgrades h2 {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 3rem;
+            background: linear-gradient(45deg, #8b5cf6, #ec4899);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .upgrade-table {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .upgrade-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .upgrade-table th {
+            background: linear-gradient(45deg, #1e293b, #334155);
+            padding: 1rem;
+            text-align: left;
+            color: #3b82f6;
+            font-weight: bold;
+        }
+
+        .upgrade-table td {
+            padding: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .upgrade-table tr:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        /* About Project Section */
+        .about-project {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        .about-project h2 {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 3rem;
+            background: linear-gradient(45deg, #06b6d4, #3b82f6);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .about-card {
+            background: rgba(15, 23, 42, 0.8);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .about-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .about-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(6, 182, 212, 0.5);
+        }
+
+        .about-card:hover::before {
+            left: 100%;
+        }
+
+        .about-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .about-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #06b6d4;
+        }
+
+        .github-link {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: linear-gradient(45deg, #374151, #4b5563);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            border: 1px solid #6b7280;
+        }
+
+        .github-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #4b5563, #374151);
+        }
+
+        /* Call to Action */
+        .cta {
+            text-align: center;
+            padding: 6rem 2rem;
+            background: radial-gradient(ellipse at center, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+        }
+
+        .cta h2 {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            background: linear-gradient(45deg, #10b981, #059669);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cta p {
+            font-size: 1.25rem;
+            margin-bottom: 3rem;
+            opacity: 0.8;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .features h2,
+            .upgrades h2,
+            .cta h2,
+            .about-project h2 {
+                font-size: 2rem;
+            }
+            
+            .play-button {
+                padding: 0.8rem 2rem;
+                font-size: 1.1rem;
+            }
+        }
+
+        /* Animated Background Elements */
+        .bg-element {
+            position: fixed;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+            z-index: -1;
+            animation: backgroundFloat 15s ease-in-out infinite;
+        }
+
+        .bg-element:nth-child(1) {
+            top: 10%;
+            left: 10%;
+            width: 100px;
+            height: 100px;
+            animation-delay: 0s;
+        }
+
+        .bg-element:nth-child(2) {
+            top: 60%;
+            right: 10%;
+            width: 150px;
+            height: 150px;
+            animation-delay: 5s;
+        }
+
+        .bg-element:nth-child(3) {
+            bottom: 20%;
+            left: 20%;
+            width: 80px;
+            height: 80px;
+            animation-delay: 10s;
+        }
+
+        @keyframes backgroundFloat {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+                opacity: 0.3;
+            }
+            50% {
+                transform: translateY(-30px) rotate(180deg);
+                opacity: 0.6;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Animated background elements -->
+    <div class="bg-element"></div>
+    <div class="bg-element"></div>
+    <div class="bg-element"></div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="logo">⚡</div>
+            <h1>Lights Over Ukraine</h1>
+            <p>Стратегічна гра в реальному часі про керування енергосистемою України під час війни. Забезпечуйте стабільне енергопостачання 33 міст попри постійні атаки на електростанції та лінії електропередач.</p>
+            <a href="index.html" class="play-button">🎮 Грати зараз</a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <h2>Особливості гри</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <span class="feature-icon">🏙️</span>
+                <h3>33 українських міста</h3>
+                <p>Керуйте енергопостачанням від Києва до Львова, від Харкова до Одеси. Кожне місто має свої потреби в електроенергії.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">⚡</span>
+                <h3>9 електростанцій</h3>
+                <p>Працюйте з АЕС, ТЕС, ГЕС та ВЕС. Найпотужніша - Запорізька АЕС з потужністю 6500 МВт.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">🔧</span>
+                <h3>Ремонтні бригади</h3>
+                <p>Наймайте та керуйте ремонтними командами для швидкого відновлення пошкоджених об'єктів.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">📈</span>
+                <h3>Система апгрейдів</h3>
+                <p>Покращуйте електростанції, лінії електропередач та активуйте автоматичний ремонт.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">⏰</span>
+                <h3>Реальний час</h3>
+                <p>Гра відбувається в реальному часі з динамічною складністю та постійними викликами.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">❤️</span>
+                <h3>Система життів</h3>
+                <p>У вас є 3 життя. Кожне втрачається, якщо місто залишається без електроенергії більше 60 секунд.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section class="stats">
+        <h2>Статистика гри</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">33</div>
+                <div class="stat-label">Міста України</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">9</div>
+                <div class="stat-label">Електростанцій</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">50+</div>
+                <div class="stat-label">Ліній електропередач</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">15000+</div>
+                <div class="stat-label">МВт загальна потужність</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Upgrades Table -->
+    <section class="upgrades">
+        <h2>Система апгрейдів</h2>
+        <div class="upgrade-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Апгрейд</th>
+                        <th>Вартість</th>
+                        <th>Ефект</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>👷‍♂️ +1 Бригада</td>
+                        <td>100 МВт·год</td>
+                        <td>+1 ремонтна одиниця, +50 МВт споживання</td>
+                    </tr>
+                    <tr>
+                        <td>🏭 Покращення станції</td>
+                        <td>300 МВт·год</td>
+                        <td>+200 МВт потужності випадкової станції</td>
+                    </tr>
+                    <tr>
+                        <td>🔌 Покращення ліній</td>
+                        <td>200-700 МВт·год</td>
+                        <td>Зменшення шансів атаки та часу ремонту</td>
+                    </tr>
+                    <tr>
+                        <td>🤖 Автоматичний ремонт</td>
+                        <td>800 МВт·год</td>
+                        <td>Автоматичне відновлення ліній (+50% швидкість)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- About Project Section -->
+    <section class="about-project">
+        <div class="about-content">
+            <h2>Про проект</h2>
+            <div class="about-grid">
+                <div class="about-card">
+                    <span class="about-icon">🤖</span>
+                    <h3>Створено з ШІ</h3>
+                    <p>Ця гра розроблена з використанням сучасних технологій штучного інтелекту для створення реалістичного симулятора енергосистеми України.</p>
+                </div>
+                <div class="about-card">
+                    <span class="about-icon">👨‍💻</span>
+                    <h3>Автор: Alexey205</h3>
+                    <p>Проект створений з метою висвітлення важливості енергетичної безпеки та складнощів управління енергосистемою в умовах війни.</p>
+                </div>
+                <div class="about-card">
+                    <span class="about-icon">📂</span>
+                    <h3>Відкритий код</h3>
+                    <p>Проект доступний на GitHub з повним вихідним кодом.</p>
+                    <a href="https://github.com/Alexey205/Lights-Over-Ukraine" target="_blank" class="github-link">
+                        🔗 GitHub Repository
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="cta">
+        <h2>Готові прийняти виклик?</h2>
+        <p>Енергосистема України потребує вашого керівництва. Зможете ви забезпечити стабільне електропостачання під час найскладніших викликів?</p>
+        <a href="index.html" class="play-button">⚡ Розпочати гру</a>
+    </section>
+
+    <footer style="background: rgba(15, 23, 42, 0.9); padding: 2rem; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+        <p style="color: rgba(255, 255, 255, 0.7); margin-bottom: 1rem;">
+            2025 Lights Over Ukraine - Створено <strong>Alexey205</strong> з використанням ШІ
+        </p>
+        <p style="color: rgba(255, 255, 255, 0.5); font-size: 0.9rem;">
+            Цей проект присвячений героїчній роботі українських енергетиків
+        </p>
+    </footer>
+
+    <script>
+        // Smooth scrolling animation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add scroll animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            // Apply animation to cards
+            const cards = document.querySelectorAll('.feature-card, .stat-card, .about-card');
+            cards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(card);
+            });
+
+            // Animate numbers in stats
+            const animateNumbers = () => {
+                const numbers = document.querySelectorAll('.stat-number');
+                numbers.forEach(num => {
+                    const target = parseInt(num.textContent.replace('+', ''));
+                    let count = 0;
+                    const increment = target / 100;
+                    
+                    const updateCount = () => {
+                        if (count < target) {
+                            count += increment;
+                            num.textContent = Math.floor(count) + (num.textContent.includes('+') ? '+' : '');
+                            requestAnimationFrame(updateCount);
+                        } else {
+                            num.textContent = target + (num.textContent.includes('+') ? '+' : '');
+                        }
+                    };
+                    
+                    // Start animation when stats section is visible
+                    const statsObserver = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                updateCount();
+                                statsObserver.unobserve(entry.target);
+                            }
+                        });
+                    });
+                    
+                    statsObserver.observe(num.closest('.stats'));
+                });
+            };
+
+            animateNumbers();
+        });
+    </script>
+</body>
+
+</html>
