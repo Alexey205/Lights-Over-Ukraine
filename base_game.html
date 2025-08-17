@@ -542,6 +542,9 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        if (location.hostname !== "alexey205.github.io/Lights-Over-Ukraine/base_game.html" && location.hostname !== "https://alexey205.github.io/Lights-Over-Ukraine/base_game.html") {
+           window.location.href = "https://alexey205.github.io/Lights-Over-Ukraine/base_game.html";
+        }
         const map = L.map('map').setView([48.5, 31], 6);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
