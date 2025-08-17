@@ -45,8 +45,15 @@
         }
 
         @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
         }
 
         .hero-content {
@@ -71,8 +78,17 @@
         }
 
         @keyframes pulse {
-            0%, 100% { transform: scale(1); box-shadow: 0 20px 40px rgba(59, 130, 246, 0.3); }
-            50% { transform: scale(1.05); box-shadow: 0 25px 50px rgba(59, 130, 246, 0.5); }
+
+            0%,
+            100% {
+                transform: scale(1);
+                box-shadow: 0 20px 40px rgba(59, 130, 246, 0.3);
+            }
+
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 25px 50px rgba(59, 130, 246, 0.5);
+            }
         }
 
         .hero h1 {
@@ -86,8 +102,13 @@
         }
 
         @keyframes glow {
-            from { filter: brightness(1); }
-            to { filter: brightness(1.2); }
+            from {
+                filter: brightness(1);
+            }
+
+            to {
+                filter: brightness(1.2);
+            }
         }
 
         .hero p {
@@ -278,9 +299,10 @@
 
         /* About Project Section */
         .about-project {
-            padding: 6rem 2rem;
-            max-width: 1200px;
+            padding: 4rem 2rem;
+            max-width: 1500px;
             margin: 0 auto;
+            border-radius: 20px;
             background: rgba(15, 23, 42, 0.5);
         }
 
@@ -331,6 +353,22 @@
 
         .about-card:hover::before {
             left: 100%;
+        }
+
+        .about-card a {
+            color: #3b82f6;
+            /* Синій колір в стилі сайту */
+            text-decoration: none;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .about-card a:hover {
+            color: #06b6d4;
+        }
+
+        .about-card a:hover::after {
+            transform: scaleX(1);
         }
 
         .about-icon {
@@ -433,13 +471,13 @@
                 margin-bottom: 0.5rem;
                 line-height: 1.2;
             }
-            
+
             .hero p {
                 font-size: 0.95rem;
                 margin-bottom: 2rem;
                 line-height: 1.4;
             }
-            
+
             .play-button {
                 padding: 0.7rem 1.5rem;
                 font-size: 1rem;
@@ -578,11 +616,11 @@
             .hero h1 {
                 font-size: 2.2rem;
             }
-            
+
             .hero p {
                 font-size: 1rem;
             }
-            
+
             .play-button {
                 padding: 0.8rem 2rem;
                 font-size: 1.1rem;
@@ -668,10 +706,13 @@
         }
 
         @keyframes backgroundFloat {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: translateY(0px) rotate(0deg);
                 opacity: 0.3;
             }
+
             50% {
                 transform: translateY(-30px) rotate(180deg);
                 opacity: 0.6;
@@ -691,7 +732,8 @@
         <div class="hero-content">
             <div class="logo">⚡</div>
             <h1>Lights Over Ukraine</h1>
-            <p>Стратегічна гра в реальному часі про керування енергосистемою України під час війни. Забезпечуйте стабільне енергопостачання 33 міст попри постійні атаки на електростанції та лінії електропередач.</p>
+            <p>Стратегічна гра в реальному часі про керування енергосистемою України під час війни. Забезпечуйте
+                стабільне енергопостачання 33 міст попри постійні атаки на електростанції та лінії електропередач.</p>
             <a href="base_game.html" class="play-button">🎮 Грати зараз</a>
         </div>
     </section>
@@ -703,7 +745,8 @@
             <div class="feature-card">
                 <span class="feature-icon">🏙️</span>
                 <h3>33 українських міста</h3>
-                <p>Керуйте енергопостачанням від Києва до Львова, від Харкова до Одеси. Кожне місто має свої потреби в електроенергії.</p>
+                <p>Керуйте енергопостачанням від Києва до Львова, від Харкова до Одеси. Кожне місто має свої потреби в
+                    електроенергії.</p>
             </div>
             <div class="feature-card">
                 <span class="feature-icon">⚡</span>
@@ -802,20 +845,36 @@
                 <div class="about-card">
                     <span class="about-icon">🤖</span>
                     <h3>Створено з ШІ</h3>
-                    <p>Ця гра розроблена з використанням сучасних технологій штучного інтелекту для створення реалістичного симулятора енергосистеми України.</p>
+                    <p>Ця гра розроблена з використанням сучасних технологій штучного інтелекту для створення
+                        реалістичного симулятора енергосистеми України.</p>
                 </div>
                 <div class="about-card">
                     <span class="about-icon">👨‍💻</span>
                     <h3>Автор: Alexey205</h3>
-                    <p>Проект створений з метою висвітлення важливості енергетичної безпеки та складнощів управління енергосистемою в умовах війни. А також щоб показати можливості ШІ за допомоги доречних запитів.</p>
+                    <p>Проект створений з метою висвітлення важливості енергетичної безпеки та складнощів управління
+                        енергосистемою в умовах війни. А також щоб показати можливості ШІ за допомоги доречних запитів.
+                    </p>
                 </div>
                 <div class="about-card">
                     <span class="about-icon">📂</span>
                     <h3>Відкритий код</h3>
-                    <p>Проект доступний на GitHub з повним вихідним кодом та документацією для розробників та дослідників.</p>
+                    <p>Проект доступний на GitHub з повним вихідним кодом та документацією для розробників та
+                        дослідників.</p>
                     <a href="https://github.com/Alexey205/Lights-Over-Ukraine" target="_blank" class="github-link">
                         🔗 GitHub Repository
                     </a>
+                </div>
+                <div class="about-card">
+                    <span class="about-icon">📜</span>
+                    <h3>Ліцензії</h3>
+                    <p>
+                        Картографічні дані: © <a href="https://www.openstreetmap.org/copyright"
+                            target="_blank">OpenStreetMap</a><br>
+                        Базові карти: © <a href="https://carto.com/" target="_blank">CartoDB</a><br>
+                        Кордони України: © <a href="https://www.geoboundaries.org" target="_blank">geoBoundaries</a>,
+                        <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a><br>
+                        Карта: © <a href="https://leafletjs.com" target="_blank">Leaflet</a><br>
+                    </p>
                 </div>
             </div>
         </div>
@@ -824,11 +883,13 @@
     <!-- Call to Action -->
     <section class="cta">
         <h2>Готові прийняти виклик?</h2>
-        <p>Енергосистема України потребує вашого керівництва. Зможете ви забезпечити стабільне електропостачання під час найскладніших викликів?</p>
+        <p>Енергосистема України потребує вашого керівництва. Зможете ви забезпечити стабільне електропостачання під час
+            найскладніших викликів?</p>
         <a href="base_game.html" class="play-button">⚡ Розпочати гру</a>
     </section>
 
-    <footer style="background: rgba(15, 23, 42, 0.9); padding: 2rem; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+    <footer
+        style="background: rgba(15, 23, 42, 0.9); padding: 2rem; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.1);">
         <p style="color: rgba(255, 255, 255, 0.7); margin-bottom: 1rem;">
             2025 Lights Over Ukraine - Створено <strong>Alexey205</strong> з використанням ШІ
         </p>
@@ -839,14 +900,14 @@
 
     <script>
         // Smooth scrolling animation
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Add scroll animations
             const observerOptions = {
                 threshold: 0.1,
                 rootMargin: '0px 0px -50px 0px'
             };
 
-            const observer = new IntersectionObserver(function(entries) {
+            const observer = new IntersectionObserver(function (entries) {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.style.opacity = '1';
@@ -871,7 +932,7 @@
                     const target = parseInt(num.textContent.replace('+', ''));
                     let count = 0;
                     const increment = target / 100;
-                    
+
                     const updateCount = () => {
                         if (count < target) {
                             count += increment;
@@ -881,7 +942,7 @@
                             num.textContent = target + (num.textContent.includes('+') ? '+' : '');
                         }
                     };
-                    
+
                     // Start animation when stats section is visible
                     const statsObserver = new IntersectionObserver((entries) => {
                         entries.forEach(entry => {
@@ -891,7 +952,7 @@
                             }
                         });
                     });
-                    
+
                     statsObserver.observe(num.closest('.stats'));
                 });
             };
@@ -902,5 +963,3 @@
 </body>
 
 </html>
-
-
