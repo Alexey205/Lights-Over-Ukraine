@@ -12,6 +12,7 @@
         body {
             margin: 0;
             height: 100%;
+            overflow-x: hidden;
         }
 
         #map {
@@ -525,6 +526,8 @@
             z-index: 1000;
             line-height: 1.4;
             width: 300px;
+            overflow: hidden;
+            transition: transform 0.3s ease-in-out;
         }
 
         #upgradesPanel button:not(.upgrade-btn) {
@@ -773,9 +776,34 @@
     <script>
         const map = L.map('map').setView([48.5, 31], 6);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
+        // Базовий шар карти
+        L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | &copy; <a href="https://carto.com/">CartoDB</a> | &copy; <a href="https://www.geoboundaries.org">geoBoundaries</a>, <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>'
         }).addTo(map);
+
+        fetch('src/geoBoundaries-UKR-ADM0_simplified.geojson')
+            .then(res => res.json())
+            .then(geojson => {
+                // Кордон України
+                L.geoJSON(geojson, {
+                    style: {
+                        color: '#2c3e50',
+                        weight: 2,
+                        opacity: 0.8,
+                        fillColor: '#2c3e50',
+                        fillOpacity: 0,
+                        dashArray: '3, 5'
+                    }
+                }).addTo(map);
+            })
+            .catch(error => console.error('Помилка завантаження GeoJSON:', error));
+
+        const bounds = L.latLngBounds(
+            [44, 22], // Південно-західний кут
+            [52.5, 40] // Північно-східний кут
+        );
+        map.setMaxBounds(bounds);
+        map.fitBounds(bounds);
 
         const cities = {
             'Київ': { coords: [50.45, 30.52], powerNeed: 1500 },
