@@ -19,6 +19,249 @@
             width: 100vw;
         }
 
+        /* Покращені стилі для міст */
+        .city-marker {
+            border-radius: 50%;
+            border: 3px solid #fff;
+            box-shadow: 0 0 15px rgba(79, 195, 247, 0.8);
+            animation: cityPulse 3s ease-in-out infinite;
+        }
+
+        .city-marker.powered {
+            background: radial-gradient(circle, #4fc3f7 0%, #29b6f6 100%);
+            box-shadow: 0 0 20px rgba(79, 195, 247, 1), 0 0 40px rgba(79, 195, 247, 0.5);
+        }
+
+        .city-marker.unpowered {
+            background: radial-gradient(circle, #424242 0%, #212121 100%);
+            box-shadow: 0 0 15px rgba(244, 67, 54, 0.8);
+            animation: cityDanger 1.5s ease-in-out infinite;
+        }
+
+        .city-marker.disabled {
+            background: radial-gradient(circle, #757575 0%, #424242 100%);
+            box-shadow: none;
+            opacity: 0.5;
+        }
+
+        /* Покращені стилі для електростанцій */
+        .power-station {
+            border-radius: 50%;
+            border: 4px solid #fff;
+            position: relative;
+            overflow: visible;
+        }
+
+        .power-station.working {
+            background: radial-gradient(circle, #43a047 0%, #2e7d32 100%);
+            box-shadow: 0 0 25px rgba(67, 160, 71, 1), 0 0 50px rgba(67, 160, 71, 0.3);
+            animation: stationWorking 2s ease-in-out infinite;
+        }
+
+        .power-station.nuclear {
+            background: radial-gradient(circle, #7e57c2 0%, #5e35b1 100%);
+            box-shadow: 0 0 30px rgba(126, 87, 194, 1);
+        }
+
+        .power-station.thermal {
+            background: radial-gradient(circle, #ff7043 0%, #d84315 100%);
+            box-shadow: 0 0 25px rgba(255, 112, 67, 1);
+        }
+
+        .power-station.hydro {
+            background: radial-gradient(circle, #29b6f6 0%, #1976d2 100%);
+            box-shadow: 0 0 25px rgba(41, 182, 246, 1);
+        }
+
+        .power-station.wind {
+            background: radial-gradient(circle, #66bb6a 0%, #388e3c 100%);
+            box-shadow: 0 0 25px rgba(102, 187, 106, 1);
+        }
+
+        .power-station.damaged {
+            background: radial-gradient(circle, #e57373 0%, #c62828 100%);
+            box-shadow: 0 0 20px rgba(229, 115, 115, 1);
+            animation: stationDamaged 0.8s ease-in-out infinite;
+        }
+
+        /* Анімації */
+        @keyframes cityPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes cityDanger {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.15);
+            }
+        }
+
+        @keyframes stationWorking {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes stationDamaged {
+
+            0%,
+            100% {
+                transform: scale(1) rotate(0deg);
+            }
+
+            25% {
+                transform: scale(1.1) rotate(-2deg);
+            }
+
+            75% {
+                transform: scale(1.1) rotate(2deg);
+            }
+        }
+
+        @keyframes lightningStrike {
+            0% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+
+            20% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+
+            40% {
+                opacity: 0.8;
+                transform: scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+        }
+
+        @keyframes repairEffect {
+            0% {
+                opacity: 0;
+                transform: scale(0.5) rotate(0deg);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.2) rotate(180deg);
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(0.8) rotate(360deg);
+            }
+        }
+
+        @keyframes upgradeEffect {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+
+            30% {
+                opacity: 1;
+                transform: scale(1.3);
+            }
+
+            60% {
+                opacity: 0.8;
+                transform: scale(1.1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(1.5);
+            }
+        }
+
+        /* Ефекти частинок */
+        .particle-effect {
+            position: absolute;
+            pointer-events: none;
+            z-index: 10000;
+        }
+
+        .spark {
+            width: 4px;
+            height: 4px;
+            background: #ffeb3b;
+            border-radius: 50%;
+            position: absolute;
+            animation: sparkFly 1s ease-out forwards;
+        }
+
+        @keyframes sparkFly {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(0.5) translate(var(--tx), var(--ty));
+            }
+        }
+
+        /* Покращені лінії електропередач */
+        .power-line {
+            stroke-dasharray: 10, 5;
+            stroke-linecap: round;
+            filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.3));
+        }
+
+        .power-line.damaged {
+            stroke-dasharray: 5, 5;
+            animation: lineDamaged 1s linear infinite;
+        }
+
+        @keyframes lineDamaged {
+            0% {
+                stroke-dashoffset: 0;
+            }
+
+            100% {
+                stroke-dashoffset: 10;
+            }
+        }
+
+        /* Іконки для різних типів станцій */
+        .station-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 16px;
+            color: white;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+            pointer-events: none;
+        }
+
         .progress-container {
             width: 60px;
             height: 6px;
@@ -31,7 +274,9 @@
         .progress-bar {
             height: 100%;
             width: 0%;
-            background-color: #4caf50;
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            border-radius: 3px;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.8);
         }
 
         .health-container {
@@ -48,7 +293,8 @@
             transition: width 0.1s linear;
             height: 100%;
             width: 100%;
-            background-color: rgba(244, 67, 54, 0.7);
+            background: linear-gradient(90deg, #f44336, #ff9800);
+            border-radius: 3px;
         }
 
         .status-working {
@@ -92,8 +338,6 @@
         }
 
         .warning-message.good-news {
-            /* background: rgba(76, 175, 80, 0.9); */
-            /* Зелений колір */
             animation: highlight-green 0.5s ease 2;
             animation-delay: 1s;
             border-color: #4CAF50;
@@ -101,8 +345,6 @@
         }
 
         .warning-message.bad-news {
-            /* background: rgba(255, 87, 34, 0.9); */
-            /* Поточний помаранчевий */
             animation: highlight 0.5s ease 2;
             animation-delay: 1s;
             border-color: #F44336;
@@ -136,7 +378,6 @@
                 transform: translateX(-50%) scale(1);
             }
         }
-
 
         @keyframes fadeOut {
             to {
@@ -200,7 +441,6 @@
         }
 
         .upgrade-btn {
-            /* Основний стиль для всіх кнопок */
             display: block;
             width: 100%;
             margin: 10px 0;
@@ -357,7 +597,6 @@
 
         #upgradesPanel.collapsed {
             transform: translateX(calc(100% + 10px));
-            /* Додаємо ще 10px за межі екрану */
         }
 
         #statusPanel {
@@ -367,9 +606,7 @@
             width: 320px;
 
             background: rgba(0, 0, 0, 0.8);
-            /* темніший фон */
             border-left: 4px solid #2196F3;
-            /* синя енергетична смуга */
             border-radius: 12px;
             padding: 16px 18px;
 
@@ -380,19 +617,15 @@
 
             box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
             backdrop-filter: blur(5px);
-            /* легке розмиття фону */
             z-index: 1000;
             transition: transform 0.3s ease-in-out;
         }
 
-        /* Заголовки / ключові слова */
         #statusPanel strong {
             color: #FFD700;
-            /* золотистий акцент */
             font-weight: bold;
         }
 
-        /* Кожен рядок як "статистика" */
         #statusPanel div {
             padding: 4px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -402,7 +635,6 @@
             border-bottom: none;
         }
 
-        /* Цифри у кольорах */
         #statusPanel span[style*="color:green"] {
             color: #81C784 !important;
             font-weight: bold;
@@ -415,7 +647,6 @@
 
         #statusPanel.collapsed {
             transform: translateX(calc(-100% - 10px));
-            /* Додаємо ще 10px за межі екрану */
         }
 
         #lives-container {
@@ -526,14 +757,12 @@
         </button>
     </div>
 
-    <!-- Контейнер для життів -->
     <div id="lives-container">
         <span class="life">❤️</span>
         <span class="life">❤️</span>
         <span class="life">❤️</span>
     </div>
 
-    <!-- Екран завершення гри -->
     <div id="game-over">
         <h2>Гру завершено!</h2>
         <p>Ви витратили всі життя</p>
@@ -542,9 +771,6 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        if (location.hostname !== "alexey205.github.io/Lights-Over-Ukraine/base_game.html" && location.hostname !== "https://alexey205.github.io/Lights-Over-Ukraine/base_game.html") {
-           window.location.href = "https://alexey205.github.io/Lights-Over-Ukraine/base_game.html";
-        }
         const map = L.map('map').setView([48.5, 31], 6);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -596,11 +822,11 @@
             { name: 'Трипільська ТЕС', coords: [50.13, 30.79], type: 'ТЕС', powerOutput: 2200 },
             { name: 'Криворізька ТЕС', coords: [47.98, 33.38], type: 'ТЕС', powerOutput: 1600 },
             { name: 'Кременчуцька ГЕС', coords: [49.10, 33.42], type: 'ГЕС', powerOutput: 450 },
-            { name: 'Ботиєвська ВЕС', coords: [46.85, 36.0], type: 'ВЕС', powerOutput: 400 }
+            { name: 'Ботієвська ВЕС', coords: [46.85, 36.0], type: 'ВЕС', powerOutput: 400 }
         ];
 
         const connections = [
-            ['Київ', 'Житомир'], ['Ботиєвська ВЕС', 'Запоріжжя'], ['Житомир', 'Рівне'], ['Рівне', 'Луцьк'], ['Луцьк', 'Львів'],
+            ['Київ', 'Житомир'], ['Ботієвська ВЕС', 'Запоріжжя'], ['Житомир', 'Рівне'], ['Рівне', 'Луцьк'], ['Луцьк', 'Львів'],
             ['Київ', 'Чернігів'], ['Київ', 'Черкаси'], ['Київ', 'Полтава'], ['Київ', 'Трипільська ТЕС'],
             ['Полтава', 'Харків'], ['Полтава', 'Краматорськ'], ['Краматорськ', 'Маріуполь'],
             ['Краматорськ', 'Дніпро'], ['Дніпро', 'Запоріжжя'], ['Дніпро', 'Криворізька ТЕС'],
@@ -634,8 +860,8 @@
         const efficiencyFactor = 0.05;
         let isGameRunning = true;
         let resourceUpdateCooldown = false;
-        let currentIncomeRate = 0; // Поточний дохід в МВт·год/хв
-        let balanceUpdateInterval; // Інтервал для оновлення балансу
+        let currentIncomeRate = 0;
+        let balanceUpdateInterval;
         let lives = 3;
         const maxLives = 3;
         let isGameOver = false;
@@ -663,7 +889,6 @@
             powerPlant: {
                 cost: 300,
                 effect: () => {
-                    // Отримуємо всі станції, крім АЕС
                     const stationNames = Object.keys(powerStationMarkers)
                         .filter(name => powerStationMarkers[name].type !== 'АЕС');
 
@@ -673,10 +898,7 @@
                     }
                     const name = stationNames[Math.floor(Math.random() * stationNames.length)];
                     powerStationMarkers[name].powerOutput += 200;
-
-                    // Оновлюємо підказку
                     updatePowerStationTooltip(name);
-
                     return name;
                 }
             }
@@ -699,14 +921,175 @@
             }
         };
 
-        // Функція для оновлення доходу в реальному часі
+        // Функція для створення ефекту частинок
+        function createParticleEffect(latLng, type = 'repair') {
+            const mapContainer = document.getElementById('map');
+            const point = map.latLngToContainerPoint(latLng);
+
+            const colors = {
+                repair: ['#4CAF50', '#8BC34A', '#CDDC39'],
+                damage: ['#FF5722', '#FF9800', '#FFC107'],
+                upgrade: ['#9C27B0', '#E91E63', '#2196F3']
+            };
+
+            const particleColors = colors[type] || colors.repair;
+
+            for (let i = 0; i < 8; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'spark';
+                particle.style.background = particleColors[Math.floor(Math.random() * particleColors.length)];
+                particle.style.left = point.x + 'px';
+                particle.style.top = point.y + 'px';
+
+                const angle = (Math.PI * 2 * i) / 8;
+                const distance = 20 + Math.random() * 30;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+
+                particle.style.setProperty('--tx', tx + 'px');
+                particle.style.setProperty('--ty', ty + 'px');
+
+                mapContainer.appendChild(particle);
+
+                setTimeout(() => {
+                    if (particle.parentNode) {
+                        particle.parentNode.removeChild(particle);
+                    }
+                }, 1000);
+            }
+        }
+
+        // Функція для створення ефекту блискавки
+        function createLightningEffect(latLng) {
+            const container = L.DomUtil.create('div', '');
+            container.innerHTML = '<span style="font-size:32px;color:#ffeb3b;text-shadow:0 0 10px #ffeb3b;">⚡</span>';
+            container.style.animation = 'lightningStrike 0.8s ease-out forwards';
+
+            const icon = L.divIcon({
+                className: '',
+                html: container.outerHTML,
+                iconSize: [32, 32],
+                iconAnchor: [16, 16]
+            });
+
+            const marker = L.marker(latLng, { icon }).addTo(map);
+
+            setTimeout(() => {
+                map.removeLayer(marker);
+            }, 800);
+        }
+
+        // Функція для створення ефекту ремонту
+        function createRepairEffect(latLng) {
+            const container = L.DomUtil.create('div', '');
+            container.innerHTML = '<span style="font-size:28px;color:#4CAF50;text-shadow:0 0 8px #4CAF50;">🔧</span>';
+            container.style.animation = 'repairEffect 1.5s ease-out forwards';
+
+            const icon = L.divIcon({
+                className: '',
+                html: container.outerHTML,
+                iconSize: [28, 28],
+                iconAnchor: [14, 14]
+            });
+
+            const marker = L.marker(latLng, { icon }).addTo(map);
+
+            setTimeout(() => {
+                map.removeLayer(marker);
+            }, 1500);
+        }
+
+        // Функція для створення ефекту апгрейду
+        function createUpgradeEffect(latLng) {
+            const container = L.DomUtil.create('div', '');
+            container.innerHTML = '<span style="font-size:24px;color:#FFD700;text-shadow:0 0 12px #FFD700;">✨</span>';
+            container.style.animation = 'upgradeEffect 2s ease-out forwards';
+
+            const icon = L.divIcon({
+                className: '',
+                html: container.outerHTML,
+                iconSize: [24, 24],
+                iconAnchor: [12, 12]
+            });
+
+            const marker = L.marker(latLng, { icon }).addTo(map);
+
+            setTimeout(() => {
+                map.removeLayer(marker);
+            }, 2000);
+        }
+
+        // Виправлена функція для оновлення станції без втрати позиції
+        function updatePowerStationVisual(stationName, damaged = false) {
+            const ps = powerStationMarkers[stationName];
+            if (!ps) return;
+
+            const container = L.DomUtil.create('div', getStationClass(ps.type, damaged));
+            container.style.width = '20px';
+            container.style.height = '20px';
+
+            const iconElement = L.DomUtil.create('div', 'station-icon', container);
+            iconElement.innerHTML = getStationIcon(ps.type);
+
+            const newIcon = L.divIcon({
+                className: '',
+                html: container.outerHTML,
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
+            });
+
+            ps.marker.setIcon(newIcon);
+        }
+
+        // Виправлена функція для оновлення міста без втрати позиції
+        function updateCityVisual(cityName, className) {
+            const marker = cityMarkers[cityName];
+            if (!marker) return;
+
+            const container = L.DomUtil.create('div', className);
+            container.style.width = '12px';
+            container.style.height = '12px';
+
+            const newIcon = L.divIcon({
+                className: '',
+                html: container.outerHTML,
+                iconSize: [12, 12],
+                iconAnchor: [6, 6]
+            });
+
+            marker.setIcon(newIcon);
+        }
+
+        // Функція для отримання іконки типу станції
+        function getStationIcon(type) {
+            const icons = {
+                'АЕС': '⚛️',
+                'ТЕС': '🏭',
+                'ГЕС': '💧',
+                'ВЕС': '💨'
+            };
+            return icons[type] || '⚡';
+        }
+
+        // Функція для отримання CSS класу станції
+        function getStationClass(type, damaged = false) {
+            if (damaged) return 'power-station damaged';
+
+            const classes = {
+                'АЕС': 'power-station nuclear working',
+                'ТЕС': 'power-station thermal working',
+                'ГЕС': 'power-station hydro working',
+                'ВЕС': 'power-station wind working'
+            };
+            return classes[type] || 'power-station working';
+        }
+
         function updateIncomeRate() {
             const { stats } = calculatePowerDistribution();
             const currentSurplus = stats.totalProduction - stats.totalConsumption;
 
             if (currentSurplus > 0) {
-                // Зменшуємо дохід у 5 разів (0.01 замість 0.05)
-                currentIncomeRate = Math.floor(currentSurplus * 0.01 * 60); // 1% від профіциту в секунду * 60
+                currentIncomeRate = Math.floor(currentSurplus * 0.01 * 60);
             } else {
                 currentIncomeRate = 0;
             }
@@ -714,10 +1097,8 @@
             document.getElementById("incomeRate").textContent = currentIncomeRate;
         }
 
-        // Функція для оновлення балансу кожну секунду
         function updateBalancePeriodically() {
             if (currentIncomeRate > 0) {
-                // Додаємо ресурси (1/60 від хвилинного доходу за секунду)
                 energyResources += currentIncomeRate / 60;
                 updateResourceUI();
                 updateUpgradeButtons();
@@ -748,18 +1129,23 @@
                 updateUpgradeButtons();
                 updateIncomeRate();
                 showWarning(`Лінії покращено до рівня "${lineUpgrades.levels[next]}"`, true);
+
+                // Ефект апгрейду на всіх лініях
+                lineLayers.forEach(conn => {
+                    const midPoint = [(conn.line.getLatLngs()[0].lat + conn.line.getLatLngs()[1].lat) / 2,
+                    (conn.line.getLatLngs()[0].lng + conn.line.getLatLngs()[1].lng) / 2];
+                    createUpgradeEffect(midPoint);
+                });
             } else {
                 showWarning(`Недостатньо ресурсів! Потрібно ${cost} МВт·год`, false);
             }
         }
 
         function createTooltipContent(name, powerInfo) {
-            // Для електростанцій
             if (powerStationMarkers[name]) {
                 const ps = powerStationMarkers[name];
                 return `<b>${name} (${ps.type})</b><div class="power-info">Потужність: ${ps.powerOutput} МВт</div>`;
             }
-            // Для міст
             return `<b>${name}</b><div class="power-info">${powerInfo}</div>`;
         }
 
@@ -772,13 +1158,11 @@
                 `Потужність: ${ps.powerOutput} МВт`
             );
 
-            // Оновлюємо підказку, якщо вона відкрита
             const tooltip = ps.marker.getTooltip();
             if (tooltip && tooltip.isOpen()) {
                 ps.marker.setTooltipContent(newContent);
             }
 
-            // Оновлюємо вміст підказки для майбутніх відображень
             ps.marker.unbindTooltip();
             ps.marker.bindTooltip(newContent, {
                 permanent: false,
@@ -790,8 +1174,9 @@
             const ps = powerStationMarkers[stationName];
             if (!ps) return;
 
-            // Оновлюємо підказку
             updatePowerStationTooltip(stationName);
+            createUpgradeEffect(ps.marker.getLatLng());
+            createParticleEffect(ps.marker.getLatLng(), 'upgrade');
 
             let blinkCount = 0;
             const maxBlinks = 6;
@@ -800,23 +1185,15 @@
             const blinkIntervalId = setInterval(() => {
                 if (blinkCount >= maxBlinks) {
                     clearInterval(blinkIntervalId);
-                    ps.marker.setStyle({
-                        color: '#43a047',
-                        fillColor: '#43a047'
-                    });
+                    updatePowerStationVisual(stationName, ps.damaged);
                     return;
                 }
 
                 if (blinkCount % 2 === 0) {
-                    ps.marker.setStyle({
-                        color: '#ffeb3b',
-                        fillColor: '#ffeb3b'
-                    });
+                    ps.marker.getElement().style.background = 'radial-gradient(circle, #ffeb3b 0%, #fbc02d 100%)';
                 } else {
-                    ps.marker.setStyle({
-                        color: '#43a047',
-                        fillColor: '#43a047'
-                    });
+                    updatePowerStationVisual(stationName, ps.damaged);
+                    ps.marker.getElement().style.background = '';
                 }
 
                 blinkCount++;
@@ -882,7 +1259,6 @@
         }
 
         function updateUpgradeButtons() {
-            // Оновлення кнопки покращення ліній
             const lineBtn = document.getElementById('lineUpgradeBtn');
             const lvl = lineUpgrades.level;
             const next = lvl + 1;
@@ -903,20 +1279,18 @@
                 lineBtn.disabled = true;
             }
 
-            // Оновлення кнопки авторемонту
             const autoRepairBtn = document.getElementById('autoRepairBtn');
             if (!lineUpgrades.autoRepair.unlocked) {
                 autoRepairBtn.querySelector('.upgrade-cost').textContent = `${lineUpgrades.autoRepair.cost} МВт·год`;
                 autoRepairBtn.disabled = energyResources < lineUpgrades.autoRepair.cost;
             } else {
                 autoRepairBtn.querySelector('.upgrade-title').innerHTML = lineUpgrades.autoRepair.active ?
-                    '<span style="color:#EF5350">Вимкнути авторемонт</span>' :
-                    '<span style="color:#66BB6A">Увімкнути авторемонт</span>';
-                autoRepairBtn.querySelector('.upgrade-icon').textContent = lineUpgrades.autoRepair.active ? '⏸️' : '▶️';
+                    '<span style="color:#EF5350">Вимкнути автοремонт</span>' :
+                    '<span style="color:#66BB6A">Увімкнути автοремонт</span>';
+                autoRepairBtn.querySelector('.upgrade-icon').textContent = lineUpgrades.autoRepair.active ? '⛔️' : '▶️';
                 autoRepairBtn.disabled = false;
             }
 
-            // Оновлення інших кнопок
             document.querySelectorAll('.upgrade-btn').forEach(btn => {
                 if (!btn.id || (btn.id !== 'lineUpgradeBtn' && btn.id !== 'autoRepairBtn')) {
                     const cost = parseInt(btn.querySelector('.upgrade-cost').textContent);
@@ -1018,28 +1392,12 @@
         function disableCity(cityName) {
             const marker = cityMarkers[cityName];
 
-            const disabledLayer = L.divIcon({
-                className: 'city-disabled',
-                iconSize: [16, 16],
-                iconAnchor: [8, 8]
-            });
-
-            const disabledMarker = L.marker(cities[cityName].coords, {
-                icon: disabledLayer,
-                interactive: false,
-                zIndexOffset: -1
-            }).addTo(map);
-
-            cityDisabledLayers[cityName] = disabledMarker;
-
             if (cityHealthMarkers[cityName]) {
                 cityHealthMarkers[cityName].marker.setOpacity(0);
             }
 
-            marker.setStyle({
-                fillOpacity: 0,
-                opacity: 0
-            });
+            // Оновлюємо клас маркера
+            updateCityVisual(cityName, 'city-marker disabled');
             loseLife();
         }
 
@@ -1051,10 +1409,7 @@
                 delete cityDisabledLayers[cityName];
             }
 
-            marker.setStyle({
-                fillOpacity: 1,
-                opacity: 1
-            });
+            updateCityVisual(cityName, 'city-marker powered');
         }
 
         function stopHealthDecrease(cityName) {
@@ -1070,17 +1425,19 @@
             enableCity(cityName);
         }
 
-        function createTooltipContent(name, powerInfo) {
-            return `<b>${name}</b><div class="power-info">${powerInfo}</div>`;
-        }
-
+        // Створення міст з покращеними іконками
         for (const [name, data] of Object.entries(cities)) {
-            const marker = L.circleMarker(data.coords, {
-                radius: 6,
-                color: '#4fc3f7',
-                fillColor: '#4fc3f7',
-                fillOpacity: 1,
-                opacity: 1,
+            const container = L.DomUtil.create('div', 'city-marker powered');
+            container.style.width = '12px';
+            container.style.height = '12px';
+
+            const marker = L.marker(data.coords, {
+                icon: L.divIcon({
+                    className: '',
+                    html: container.outerHTML,
+                    iconSize: [12, 12],
+                    iconAnchor: [6, 6]
+                }),
                 zIndexOffset: 1000
             }).addTo(map);
 
@@ -1095,7 +1452,7 @@
 
         function showProgressBar(latlng, duration, onComplete) {
             const container = L.DomUtil.create('div', 'progress-container');
-            L.DomUtil.create('div', 'progress-bar', container);
+            const progressBar = L.DomUtil.create('div', 'progress-bar', container);
 
             const icon = L.divIcon({
                 className: '',
@@ -1130,12 +1487,22 @@
             requestAnimationFrame(animate);
         }
 
+        // Створення електростанцій з покращеними іконками
         powerStations.forEach((station) => {
-            const marker = L.circleMarker(station.coords, {
-                radius: 10,
-                color: '#43a047',
-                fillColor: '#43a047',
-                fillOpacity: 1,
+            const container = L.DomUtil.create('div', getStationClass(station.type));
+            container.style.width = '20px';
+            container.style.height = '20px';
+
+            const iconElement = L.DomUtil.create('div', 'station-icon', container);
+            iconElement.innerHTML = getStationIcon(station.type);
+
+            const marker = L.marker(station.coords, {
+                icon: L.divIcon({
+                    className: '',
+                    html: container.outerHTML,
+                    iconSize: [20, 20],
+                    iconAnchor: [10, 10]
+                }),
                 zIndexOffset: 2000
             }).addTo(map);
 
@@ -1154,7 +1521,6 @@
 
             marker.on('click', () => {
                 repairPowerStation(station.name);
-                // Оновлюємо підказку після ремонту
                 updatePowerStationTooltip(station.name);
             });
         });
@@ -1177,14 +1543,18 @@
                     map.removeLayer(ps.fire);
                     ps.fire = null;
                 }
-                ps.marker.setStyle({
-                    color: '#43a047',
-                    fillColor: '#43a047'
-                });
+
+                // Оновлюємо клас елемента
+                updatePowerStationVisual(name, false);
+
+                // Ефекти ремонту
+                createRepairEffect(ps.marker.getLatLng());
+                createParticleEffect(ps.marker.getLatLng(), 'repair');
+
                 repairTeams++;
                 updateTeamStatus();
                 updateCityPowerStatus();
-                updateIncomeRate(); // Оновлюємо дохід після ремонту
+                updateIncomeRate();
             });
         }
 
@@ -1198,13 +1568,17 @@
             });
             line.damageMarker.setOpacity(0);
 
+            // Ефекти ремонту
+            createRepairEffect(line.damageMarker.getLatLng());
+            createParticleEffect(line.damageMarker.getLatLng(), 'repair');
+
             if (line.repairTimer) {
                 clearTimeout(line.repairTimer);
                 line.repairTimer = null;
             }
 
             updateCityPowerStatus();
-            updateIncomeRate(); // Оновлюємо дохід після ремонту
+            updateIncomeRate();
         }
 
         function midpoint(coord1, coord2) {
@@ -1291,11 +1665,11 @@
 
         function getDistance(latLng1, latLng2) {
             const R = 6371;
-            const dLat = (latLng2[0] - latLng1[0]) * Math.PI / 180;
-            const dLon = (latLng2[1] - latLng1[1]) * Math.PI / 180;
+            const dLat = (latLng2.lat - latLng1[0]) * Math.PI / 180;
+            const dLon = (latLng2.lng - latLng1[1]) * Math.PI / 180;
             const a =
                 Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(latLng1[0] * Math.PI / 180) * Math.cos(latLng2[0] * Math.PI / 180) *
+                Math.cos(latLng1[0] * Math.PI / 180) * Math.cos(latLng2.lat * Math.PI / 180) *
                 Math.sin(dLon / 2) * Math.sin(dLon / 2);
             return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         }
@@ -1367,7 +1741,7 @@
 
         function updateCityPowerStatus() {
             const { distribution, stats } = calculatePowerDistribution();
-            updateIncomeRate(); // Оновлюємо дохід при зміні статусу міст
+            updateIncomeRate();
 
             for (const [city, marker] of Object.entries(cityMarkers)) {
                 const powered = distribution[city] || false;
@@ -1379,18 +1753,12 @@
                         stopHealthDecrease(city);
                         resetCityHealth(city);
                         updateCityHealthIndicator(city, false);
-                        marker.setStyle({
-                            fillColor: '#4fc3f7',
-                            color: '#4fc3f7'
-                        });
+                        updateCityVisual(city, 'city-marker powered');
                     } else {
                         resetCityHealth(city);
                         updateCityHealthIndicator(city, true);
                         startHealthDecrease(city);
-                        marker.setStyle({
-                            fillColor: 'black',
-                            color: 'black'
-                        });
+                        updateCityVisual(city, 'city-marker unpowered');
                     }
                 }
             }
@@ -1400,6 +1768,7 @@
             updateIncomeRate();
         }
 
+        // Створення з'єднань з покращеними лініями
         connections.forEach(([from, to]) => {
             const latlngs = [
                 cities[from]?.coords || powerStations.find(p => p.name === from)?.coords,
@@ -1408,13 +1777,17 @@
 
             const line = L.polyline(latlngs, {
                 color: lineUpgrades.colors[lineUpgrades.level],
-                weight: lineUpgrades.weights[lineUpgrades.level]
+                weight: lineUpgrades.weights[lineUpgrades.level],
+                className: 'power-line'
             }).addTo(map).bringToBack();
+
+            const damageIcon = L.DomUtil.create('div', '');
+            damageIcon.innerHTML = '<span style="font-size:24px;line-height:24px;color:#ff5722;text-shadow:0 0 8px #ff5722;">⚡</span>';
 
             const damageMarker = L.marker(midpoint(latlngs[0], latlngs[1]), {
                 icon: L.divIcon({
-                    className: 'damage-icon',
-                    html: '<span style="font-size:24px;line-height:24px;">⚡</span>',
+                    className: '',
+                    html: damageIcon.outerHTML,
                     iconSize: [24, 24],
                     iconAnchor: [12, 12]
                 }),
@@ -1451,7 +1824,6 @@
                     lineUpgrades.repairTimes[lineUpgrades.level];
 
                 showProgressBar(damageMarker.getLatLng(), repairTime, () => {
-
                     repairLine(conn);
                     repairTeams++;
                     updateTeamStatus();
@@ -1477,9 +1849,16 @@
                     const dmgChance = lineUpgrades.damageChances[lineUpgrades.level];
                     if (Math.random() < dmgChance) {
                         randomLine.damaged = true;
-                        randomLine.line.setStyle({ color: '#ff0000' });
+                        randomLine.line.setStyle({
+                            color: '#ff0000',
+                            className: 'power-line damaged'
+                        });
                         randomLine.damageMarker.setOpacity(1);
                         attackExecuted = true;
+
+                        // Ефект атаки
+                        createLightningEffect(randomLine.damageMarker.getLatLng());
+                        createParticleEffect(randomLine.damageMarker.getLatLng(), 'damage');
 
                         if (lineUpgrades.autoRepair.unlocked && lineUpgrades.autoRepair.active) {
                             if (repairTeams > 0 && !randomLine.repairInProgress) {
@@ -1524,19 +1903,29 @@
                 if (workingStations.length > 0) {
                     const randomStation = workingStations[Math.floor(Math.random() * workingStations.length)];
                     randomStation.damaged = true;
+
+                    // Створення ефекту пожежі
+                    const fireContainer = L.DomUtil.create('div', '');
+                    fireContainer.innerHTML = '<span style="font-size:20px;line-height:20px;color:#ff5722;text-shadow:0 0 10px #ff5722;">🔥</span>';
+
                     randomStation.fire = L.marker(randomStation.marker.getLatLng(), {
                         icon: L.divIcon({
-                            className: 'fire-icon',
-                            html: '<span style="font-size:20px;line-height:20px;">🔥</span>',
+                            className: '',
+                            html: fireContainer.outerHTML,
                             iconSize: [20, 20],
                             iconAnchor: [10, 20]
                         }),
                         zIndexOffset: 2001
                     }).addTo(map);
-                    randomStation.marker.setStyle({
-                        color: '#e57373',
-                        fillColor: '#e57373'
-                    });
+
+                    // Оновлення класу станції
+                    const stationName = Object.keys(powerStationMarkers).find(name => powerStationMarkers[name] === randomStation);
+                    updatePowerStationVisual(stationName, true);
+
+                    // Ефекти атаки
+                    createLightningEffect(randomStation.marker.getLatLng());
+                    createParticleEffect(randomStation.marker.getLatLng(), 'damage');
+
                     attackExecuted = true;
                 }
             }
@@ -1567,6 +1956,7 @@
                                 repairTime,
                                 () => {
                                     repairLine(lineToRepair);
+                                    lineToRepair.repairInProgress = false;
                                     repairTeams++;
                                     updateTeamStatus();
                                 }
@@ -1603,7 +1993,6 @@
             }, dynamicDelay);
         }
 
-        // Функція оновлення відображення життів
         function updateLivesDisplay() {
             const lifeElements = document.querySelectorAll('.life');
             lifeElements.forEach((el, index) => {
@@ -1611,7 +2000,6 @@
             });
         }
 
-        // Функція втрати життя
         function loseLife() {
             if (isGameOver) return;
 
@@ -1625,7 +2013,6 @@
             }
         }
 
-        // Функція завершення гри
         function endGame() {
             isGameOver = true;
             document.getElementById('game-over').style.display = 'flex';
@@ -1633,7 +2020,6 @@
             clearTimeout(attackTimeout);
         }
 
-        // Функція рестарту гри
         function restartGame() {
             document.getElementById('game-over').style.opacity = '0';
             setTimeout(() => location.reload(), 500);
@@ -1662,7 +2048,7 @@
             const toggleUpgrades = document.getElementById('toggleUpgradesPanel');
             const toggleStatus = document.getElementById('toggleStatusPanel');
 
-            // Початковий стан - сховано
+            // Початковий стан - схований
             upgradesPanel.classList.add('collapsed');
             statusPanel.classList.add('collapsed');
 
