@@ -1,7 +1,8 @@
 <p align="center">
   <img src="https://raw.githubusercontent.com/Alexey205/Lights-Over-Ukraine/main/src/icon.png" alt="Lights Over Ukraine logo" width="128"/>
 </p>
-# ⚡ Lights Over Ukraine
+
+## ⚡ Lights Over Ukraine
 
 **Lights Over Ukraine** — це стратегічна гра в реальному часі, де ви виступаєте в ролі керівника енергосистеми України під час масштабної війни. Ваше завдання — забезпечити стабільне енергопостачання міст попри постійні атаки на електростанції та лінії електропередач.
 
