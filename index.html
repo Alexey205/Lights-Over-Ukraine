@@ -5,6 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Lights Over Ukraine - Стратегічна гра про енергосистему України</title>
+    <meta name="description" content="Стратегічна гра в реальному часі про керування енергосистемою України під час війни. Забезпечуйте стабільне енергопостачання 33 міст попри постійні атаки.">
+    <meta name="keywords" content="гра, стратегія, енергосистема, Україна, симулятор">
+    <meta property="og:title" content="Lights Over Ukraine">
+    <meta property="og:description" content="Керуйте енергосистемою України під час війни">
+    <meta property="og:type" content="website">
     <link rel="icon" href="src/icon.png" type="image/png">
     <style>
         * {
@@ -22,6 +27,183 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            background: rgba(15, 23, 42, 0.98);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 70px;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3b82f6;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .nav-logo:hover {
+            color: #06b6d4;
+        }
+
+        .nav-logo::before {
+            content: '⚡';
+            margin-right: 0.5rem;
+            font-size: 1.8rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-link:hover {
+            color: #3b82f6;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(45deg, #3b82f6, #06b6d4);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        /* Language Switcher */
+        .lang-switcher {
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 25px;
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .lang-switcher:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        .lang-option {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .lang-option.active {
+            background: linear-gradient(45deg, #3b82f6, #06b6d4);
+            color: white;
+        }
+
+        .lang-option:not(.active) {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Mobile menu button */
+        .mobile-menu-btn {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 0.5rem;
+            background: none;
+            border: none;
+            color: white;
+        }
+
+        .mobile-menu-btn span {
+            width: 25px;
+            height: 3px;
+            background: white;
+            margin: 3px 0;
+            transition: 0.3s;
+            border-radius: 2px;
+        }
+
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #3b82f6, #06b6d4);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 999;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(59, 130, 246, 0.5);
+        }
+
         /* Hero Section */
         .hero {
             min-height: 100vh;
@@ -31,6 +213,7 @@
             text-align: center;
             position: relative;
             background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            padding-top: 70px;
         }
 
         .hero::before {
@@ -45,12 +228,9 @@
         }
 
         @keyframes float {
-
-            0%,
-            100% {
+            0%, 100% {
                 transform: translateY(0px);
             }
-
             50% {
                 transform: translateY(-20px);
             }
@@ -75,16 +255,14 @@
             font-size: 4rem;
             box-shadow: 0 20px 40px rgba(59, 130, 246, 0.3);
             animation: pulse 2s ease-in-out infinite;
+            will-change: transform;
         }
 
         @keyframes pulse {
-
-            0%,
-            100% {
+            0%, 100% {
                 transform: scale(1);
                 box-shadow: 0 20px 40px rgba(59, 130, 246, 0.3);
             }
-
             50% {
                 transform: scale(1.05);
                 box-shadow: 0 25px 50px rgba(59, 130, 246, 0.5);
@@ -105,7 +283,6 @@
             from {
                 filter: brightness(1);
             }
-
             to {
                 filter: brightness(1.2);
             }
@@ -130,12 +307,18 @@
             box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
             transition: all 0.3s ease;
             border: 2px solid transparent;
+            will-change: transform;
         }
 
         .play-button:hover {
             transform: translateY(-3px);
             box-shadow: 0 15px 40px rgba(16, 185, 129, 0.6);
             background: linear-gradient(45deg, #10b981, #059669);
+        }
+
+        /* Sections spacing */
+        section {
+            scroll-margin-top: 70px;
         }
 
         /* Features Section */
@@ -170,6 +353,7 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            will-change: transform;
         }
 
         .feature-card::before {
@@ -232,6 +416,7 @@
             border-radius: 15px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
+            will-change: transform;
         }
 
         .stat-card:hover {
@@ -297,7 +482,95 @@
             background: rgba(59, 130, 246, 0.1);
         }
 
-        /* About Project Section */
+        /* FAQ Section */
+        .faq {
+            padding: 6rem 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(15, 23, 42, 0.3);
+            border-radius: 20px;
+        }
+
+        .faq h2 {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 3rem;
+            background: linear-gradient(45deg, #f59e0b, #f97316);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .faq-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .faq-item {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .faq-question {
+            padding: 1.5rem;
+            background: linear-gradient(45deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .faq-question:hover {
+            background: linear-gradient(45deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2));
+        }
+
+        .faq-question::after {
+            content: '+';
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3b82f6;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-question::after {
+            transform: rotate(45deg);
+            color: #06b6d4;
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            background: rgba(15, 23, 42, 0.6);
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 200px;
+            padding: 1.5rem;
+        }
+
+        .faq-answer p {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .faq-icon {
+            margin-right: 1rem;
+            font-size: 1.3rem;
+        }
         .about-project {
             padding: 4rem 2rem;
             max-width: 1500px;
@@ -332,6 +605,7 @@
             position: relative;
             overflow: hidden;
             text-align: center;
+            will-change: transform;
         }
 
         .about-card::before {
@@ -357,7 +631,6 @@
 
         .about-card a {
             color: #3b82f6;
-            /* Синій колір в стилі сайту */
             text-decoration: none;
             transition: color 0.3s ease;
             position: relative;
@@ -365,10 +638,6 @@
 
         .about-card a:hover {
             color: #06b6d4;
-        }
-
-        .about-card a:hover::after {
-            transform: scaleX(1);
         }
 
         .about-icon {
@@ -428,7 +697,8 @@
 
         /* Touch-friendly improvements */
         .play-button,
-        .github-link {
+        .github-link,
+        .back-to-top {
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
         }
@@ -442,234 +712,6 @@
         /* Smooth scrolling */
         html {
             scroll-behavior: smooth;
-        }
-
-        /* Mobile First - Base styles for mobile */
-        @media (max-width: 480px) {
-            body {
-                font-size: 14px;
-            }
-
-            .hero {
-                min-height: 90vh;
-                padding: 1rem 0;
-            }
-
-            .hero-content {
-                padding: 1rem;
-            }
-
-            .logo {
-                width: 80px;
-                height: 80px;
-                font-size: 2.5rem;
-                margin-bottom: 1.5rem;
-            }
-
-            .hero h1 {
-                font-size: 1.8rem;
-                margin-bottom: 0.5rem;
-                line-height: 1.2;
-            }
-
-            .hero p {
-                font-size: 0.95rem;
-                margin-bottom: 2rem;
-                line-height: 1.4;
-            }
-
-            .play-button {
-                padding: 0.7rem 1.5rem;
-                font-size: 1rem;
-                border-radius: 25px;
-            }
-
-            /* Sections */
-            .features,
-            .upgrades,
-            .about-project {
-                padding: 3rem 1rem;
-            }
-
-            .stats {
-                padding: 3rem 1rem;
-            }
-
-            .cta {
-                padding: 3rem 1rem;
-            }
-
-            .features h2,
-            .upgrades h2,
-            .cta h2,
-            .about-project h2 {
-                font-size: 1.5rem;
-                margin-bottom: 2rem;
-            }
-
-            .stats h2 {
-                font-size: 1.5rem;
-                margin-bottom: 2rem;
-            }
-
-            /* Feature cards */
-            .features-grid,
-            .about-grid {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }
-
-            .feature-card,
-            .about-card {
-                padding: 1.5rem;
-                border-radius: 15px;
-            }
-
-            .feature-icon,
-            .about-icon {
-                font-size: 2rem;
-                margin-bottom: 0.75rem;
-            }
-
-            .feature-card h3,
-            .about-card h3 {
-                font-size: 1.2rem;
-                margin-bottom: 0.75rem;
-            }
-
-            .feature-card p,
-            .about-card p {
-                font-size: 0.9rem;
-                line-height: 1.4;
-            }
-
-            /* Stats */
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 1rem;
-                max-width: 400px;
-            }
-
-            .stat-card {
-                padding: 1rem;
-            }
-
-            .stat-number {
-                font-size: 2rem;
-            }
-
-            .stat-label {
-                font-size: 0.9rem;
-            }
-
-            /* Upgrade table */
-            .upgrade-table {
-                border-radius: 15px;
-                overflow-x: auto;
-            }
-
-            .upgrade-table table {
-                min-width: 500px;
-            }
-
-            .upgrade-table th,
-            .upgrade-table td {
-                padding: 0.75rem 0.5rem;
-                font-size: 0.85rem;
-            }
-
-            /* CTA */
-            .cta h2 {
-                font-size: 1.5rem;
-                margin-bottom: 1rem;
-            }
-
-            .cta p {
-                font-size: 1rem;
-                margin-bottom: 2rem;
-            }
-
-            /* GitHub link */
-            .github-link {
-                padding: 0.4rem 0.8rem;
-                font-size: 0.85rem;
-                margin-top: 0.75rem;
-            }
-
-            /* Footer */
-            footer {
-                padding: 1.5rem 1rem !important;
-            }
-
-            footer p {
-                font-size: 0.85rem !important;
-            }
-
-            /* Background elements - hide on mobile for performance */
-            .bg-element {
-                display: none;
-            }
-        }
-
-        /* Tablet styles */
-        @media (min-width: 481px) and (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.2rem;
-            }
-
-            .hero p {
-                font-size: 1rem;
-            }
-
-            .play-button {
-                padding: 0.8rem 2rem;
-                font-size: 1.1rem;
-            }
-
-            .features,
-            .upgrades,
-            .about-project {
-                padding: 4rem 2rem;
-            }
-
-            .features h2,
-            .upgrades h2,
-            .cta h2,
-            .about-project h2 {
-                font-size: 2.2rem;
-            }
-
-            .features-grid,
-            .about-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 1.5rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 1.5rem;
-            }
-
-            /* Make upgrade table scrollable on tablet */
-            .upgrade-table {
-                overflow-x: auto;
-            }
-        }
-
-        /* Large tablet/small desktop */
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .hero h1 {
-                font-size: 3rem;
-            }
-
-            .features-grid,
-            .about-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
         }
 
         /* Animated Background Elements */
@@ -706,174 +748,394 @@
         }
 
         @keyframes backgroundFloat {
-
-            0%,
-            100% {
+            0%, 100% {
                 transform: translateY(0px) rotate(0deg);
                 opacity: 0.3;
             }
-
             50% {
                 transform: translateY(-30px) rotate(180deg);
                 opacity: 0.6;
+            }
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: flex;
+            }
+
+            .nav-menu {
+                position: fixed;
+                top: 70px;
+                left: -100%;
+                width: 100%;
+                height: calc(100vh - 70px);
+                background: rgba(15, 23, 42, 0.98);
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+                padding-top: 2rem;
+                gap: 1.5rem;
+                transition: left 0.3s ease;
+                backdrop-filter: blur(20px);
+            }
+
+            .nav-menu.active {
+                left: 0;
+            }
+
+            .nav-container {
+                padding: 0 1rem;
+            }
+
+            .nav-logo {
+                font-size: 1.2rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+                margin-bottom: 2rem;
+            }
+
+            .play-button {
+                padding: 0.8rem 2rem;
+                font-size: 1rem;
+            }
+
+            .features, .upgrades, .about-project {
+                padding: 3rem 1rem;
+            }
+
+            .stats {
+                padding: 3rem 1rem;
+            }
+
+            .cta {
+                padding: 3rem 1rem;
+            }
+
+            .features h2, .upgrades h2, .cta h2, .about-project h2 {
+                font-size: 2rem;
+                margin-bottom: 2rem;
+            }
+
+            .stats h2 {
+                font-size: 2rem;
+                margin-bottom: 2rem;
+            }
+
+            .faq h2 {
+                font-size: 2rem;
+                margin-bottom: 2rem;
+            }
+
+            .faq {
+                padding: 3rem 1rem;
+            }
+
+            .faq-question {
+                padding: 1rem;
+                font-size: 1rem;
+            }
+
+            .faq-item.active .faq-answer {
+                max-height: 300px;
+                padding: 1rem;
+            }
+
+            .faq-icon {
+                margin-right: 0.5rem;
+                font-size: 1.1rem;
+            }
+
+            .back-to-top {
+                bottom: 1rem;
+                right: 1rem;
+                width: 45px;
+                height: 45px;
+                font-size: 1rem;
+            }
+
+            .bg-element {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+
+            .logo {
+                width: 80px;
+                height: 80px;
+                font-size: 2.5rem;
+            }
+
+            .features-grid, .about-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+
+            .upgrade-table {
+                overflow-x: auto;
+            }
+
+            .upgrade-table table {
+                min-width: 500px;
             }
         }
     </style>
 </head>
 
 <body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#hero" class="nav-logo">Lights Over Ukraine</a>
+            
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="#features" class="nav-link" data-uk="Особливості" data-en="Features">Особливості</a></li>
+                <li><a href="#stats" class="nav-link" data-uk="Статистика" data-en="Statistics">Статистика</a></li>
+                <li><a href="#upgrades" class="nav-link" data-uk="Апгрейди" data-en="Upgrades">Апгрейди</a></li>
+                <li><a href="#faq" class="nav-link" data-uk="FAQ" data-en="FAQ">FAQ</a></li>
+                <li><a href="#about" class="nav-link" data-uk="Про проект" data-en="About">Про проект</a></li>
+            </ul>
+
+            <div class="nav-right">
+                <div class="lang-switcher" id="lang-switcher">
+                    <div class="lang-option active" data-lang="uk">УКР</div>
+                    <div class="lang-option" data-lang="en">ENG</div>
+                </div>
+                
+                <button class="mobile-menu-btn" id="mobile-menu-btn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="back-to-top" title="Повернутися наверх">
+        ↑
+    </button>
+
     <!-- Animated background elements -->
     <div class="bg-element"></div>
     <div class="bg-element"></div>
     <div class="bg-element"></div>
 
     <!-- Hero Section -->
-    <section class="hero">
+    <section class="hero" id="hero">
         <div class="hero-content">
             <div class="logo">⚡</div>
-            <h1>Lights Over Ukraine</h1>
-            <p>Стратегічна гра в реальному часі про керування енергосистемою України під час війни. Забезпечуйте
-                стабільне енергопостачання 33 міст попри постійні атаки на електростанції та лінії електропередач.</p>
-            <a href="base_game.html" class="play-button">🎮 Грати зараз</a>
+            <h1 data-uk="Lights Over Ukraine" data-en="Lights Over Ukraine">Lights Over Ukraine</h1>
+            <p data-uk="Стратегічна гра в реальному часі про керування енергосистемою України під час війни. Забезпечуйте стабільне енергопостачання 33 міст попри постійні атаки на електростанції та лінії електропередач." data-en="Real-time strategic game about managing Ukraine's energy system during wartime. Ensure stable power supply to 33 cities despite constant attacks on power plants and transmission lines.">Стратегічна гра в реальному часі про керування енергосистемою України під час війни. Забезпечуйте стабільне енергопостачання 33 міст попри постійні атаки на електростанції та лінії електропередач.</p>
+            <a href="base_game.html" class="play-button" data-uk="🎮 Грати зараз" data-en="🎮 Play Now">🎮 Грати зараз</a>
         </div>
     </section>
 
     <!-- Features Section -->
-    <section class="features">
-        <h2>Особливості гри</h2>
+    <section class="features" id="features">
+        <h2 data-uk="Особливості гри" data-en="Game Features">Особливості гри</h2>
         <div class="features-grid">
             <div class="feature-card">
                 <span class="feature-icon">🏙️</span>
-                <h3>33 українських міста</h3>
-                <p>Керуйте енергопостачанням від Києва до Львова, від Харкова до Одеси. Кожне місто має свої потреби в
-                    електроенергії.</p>
+                <h3 data-uk="33 українських міста" data-en="33 Ukrainian Cities">33 українських міста</h3>
+                <p data-uk="Керуйте енергопостачанням від Києва до Львова, від Харкова до Одеси. Кожне місто має свої потреби в електроенергії." data-en="Manage power supply from Kyiv to Lviv, from Kharkiv to Odesa. Each city has its own electricity needs.">Керуйте енергопостачанням від Києва до Львова, від Харкова до Одеси. Кожне місто має свої потреби в електроенергії.</p>
             </div>
             <div class="feature-card">
                 <span class="feature-icon">⚡</span>
-                <h3>9 електростанцій</h3>
-                <p>Працюйте з АЕС, ТЕС, ГЕС та ВЕС. Найпотужніша - Запорізька АЕС з потужністю 6500 МВт.</p>
+                <h3 data-uk="9 електростанцій" data-en="9 Power Plants">9 електростанцій</h3>
+                <p data-uk="Працюйте з АЕС, ТЕС, ГЕС та ВЕС. Найпотужніша - Запорізька АЕС з потужністю 6500 МВт." data-en="Work with nuclear, thermal, hydro and wind power plants. The most powerful is Zaporizhzhia NPP with 6500 MW capacity.">Працюйте з АЕС, ТЕС, ГЕС та ВЕС. Найпотужніша - Запорізька АЕС з потужністю 6500 МВт.</p>
             </div>
             <div class="feature-card">
                 <span class="feature-icon">🔧</span>
-                <h3>Ремонтні бригади</h3>
-                <p>Наймайте та керуйте ремонтними командами для швидкого відновлення пошкоджених об'єктів.</p>
+                <h3 data-uk="Ремонтні бригади" data-en="Repair Teams">Ремонтні бригади</h3>
+                <p data-uk="Наймайте та керуйте ремонтними командами для швидкого відновлення пошкоджених об'єктів." data-en="Hire and manage repair teams for quick restoration of damaged facilities.">Наймайте та керуйте ремонтними командами для швидкого відновлення пошкоджених об'єктів.</p>
             </div>
             <div class="feature-card">
                 <span class="feature-icon">📈</span>
-                <h3>Система апгрейдів</h3>
-                <p>Покращуйте електростанції, лінії електропередач та активуйте автоматичний ремонт.</p>
+                <h3 data-uk="Система апгрейдів" data-en="Upgrade System">Система апгрейдів</h3>
+                <p data-uk="Покращуйте електростанції, лінії електропередач та активуйте автоматичний ремонт." data-en="Improve power plants, transmission lines and activate automatic repair.">Покращуйте електростанції, лінії електропередач та активуйте автоматичний ремонт.</p>
             </div>
             <div class="feature-card">
                 <span class="feature-icon">⏰</span>
-                <h3>Реальний час</h3>
-                <p>Гра відбувається в реальному часі з динамічною складністю та постійними викликами.</p>
+                <h3 data-uk="Реальний час" data-en="Real Time">Реальний час</h3>
+                <p data-uk="Гра відбувається в реальному часі з динамічною складністю та постійними викликами." data-en="The game takes place in real time with dynamic difficulty and constant challenges.">Гра відбувається в реальному часі з динамічною складністю та постійними викликами.</p>
             </div>
             <div class="feature-card">
                 <span class="feature-icon">❤️</span>
-                <h3>Система життів</h3>
-                <p>У вас є 3 життя. Кожне втрачається, якщо місто залишається без електроенергії більше 60 секунд.</p>
+                <h3 data-uk="Система життів" data-en="Lives System">Система життів</h3>
+                <p data-uk="У вас є 3 життя. Кожне втрачається, якщо місто залишається без електроенергії більше 60 секунд." data-en="You have 3 lives. Each is lost if a city remains without electricity for more than 60 seconds.">У вас є 3 життя. Кожне втрачається, якщо місто залишається без електроенергії більше 60 секунд.</p>
             </div>
         </div>
     </section>
 
     <!-- Statistics Section -->
-    <section class="stats">
-        <h2>Статистика гри</h2>
+    <section class="stats" id="stats">
+        <h2 data-uk="Статистика гри" data-en="Game Statistics">Статистика гри</h2>
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-number">33</div>
-                <div class="stat-label">Міста України</div>
+                <div class="stat-label" data-uk="Міста України" data-en="Ukrainian Cities">Міста України</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number">9</div>
-                <div class="stat-label">Електростанцій</div>
+                <div class="stat-label" data-uk="Електростанцій" data-en="Power Plants">Електростанцій</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number">50+</div>
-                <div class="stat-label">Ліній електропередач</div>
+                <div class="stat-label" data-uk="Ліній електропередач" data-en="Transmission Lines">Ліній електропередач</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number">15000+</div>
-                <div class="stat-label">МВт загальна потужність</div>
+                <div class="stat-label" data-uk="МВт загальна потужність" data-en="MW Total Capacity">МВт загальна потужність</div>
             </div>
         </div>
     </section>
 
     <!-- Upgrades Table -->
-    <section class="upgrades">
-        <h2>Система апгрейдів</h2>
+    <section class="upgrades" id="upgrades">
+        <h2 data-uk="Система апгрейдів" data-en="Upgrade System">Система апгрейдів</h2>
         <div class="upgrade-table">
             <table>
                 <thead>
                     <tr>
-                        <th>Апгрейд</th>
-                        <th>Вартість</th>
-                        <th>Ефект</th>
+                        <th data-uk="Апгрейд" data-en="Upgrade">Апгрейд</th>
+                        <th data-uk="Вартість" data-en="Cost">Вартість</th>
+                        <th data-uk="Ефект" data-en="Effect">Ефект</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>👷‍♂️ +1 Бригада</td>
-                        <td>100 МВт·год</td>
-                        <td>+1 ремонтна одиниця, +50 МВт споживання</td>
+                        <td data-uk="👷‍♂️ +1 Бригада" data-en="👷‍♂️ +1 Team">👷‍♂️ +1 Бригада</td>
+                        <td data-uk="100 МВт·год" data-en="100 MWh">100 МВт·год</td>
+                        <td data-uk="+1 ремонтна одиниця, +50 МВт споживання" data-en="+1 repair unit, +50 MW consumption">+1 ремонтна одиниця, +50 МВт споживання</td>
                     </tr>
                     <tr>
-                        <td>🏭 Покращення станції</td>
-                        <td>300 МВт·год</td>
-                        <td>+200 МВт потужності випадкової станції</td>
+                        <td data-uk="🏭 Покращення станції" data-en="🏭 Station Upgrade">🏭 Покращення станції</td>
+                        <td data-uk="300 МВт·год" data-en="300 MWh">300 МВт·год</td>
+                        <td data-uk="+200 МВт потужності випадкової станції" data-en="+200 MW capacity to random station">+200 МВт потужності випадкової станції</td>
                     </tr>
                     <tr>
-                        <td>🔌 Покращення ліній</td>
-                        <td>200-700 МВт·год</td>
-                        <td>Зменшення шансів атаки та часу ремонту</td>
+                        <td data-uk="🔌 Покращення ліній" data-en="🔌 Line Upgrade">🔌 Покращення ліній</td>
+                        <td data-uk="200-700 МВт·год" data-en="200-700 MWh">200-700 МВт·год</td>
+                        <td data-uk="Зменшення шансів атаки та часу ремонту" data-en="Reduced attack chances and repair time">Зменшення шансів атаки та часу ремонту</td>
                     </tr>
                     <tr>
-                        <td>🤖 Автоматичний ремонт</td>
-                        <td>800 МВт·год</td>
-                        <td>Автоматичне відновлення ліній (+50% швидкість)</td>
+                        <td data-uk="🤖 Автоматичний ремонт" data-en="🤖 Auto Repair">🤖 Автоматичний ремонт</td>
+                        <td data-uk="800 МВт·год" data-en="800 MWh">800 МВт·год</td>
+                        <td data-uk="Автоматичне відновлення ліній (+50% швидкість)" data-en="Automatic line restoration (+50% speed)">Автоматичне відновлення ліній (+50% швидкість)</td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </section>
 
+    <!-- FAQ Section -->
+    <section class="faq" id="faq">
+        <h2 data-uk="Часті питання" data-en="Frequently Asked Questions">Часті питання</h2>
+        <div class="faq-container">
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span><span class="faq-icon">🎮</span><span data-uk="Як розпочати гру?" data-en="How to start playing?">Як розпочати гру?</span></span>
+                </div>
+                <div class="faq-answer">
+                    <p data-uk="Для початку гри натисніть на кнопку 'Грати зараз' або 'Розпочати гру' на головній сторінці сайту. Ви будете перенаправлені до ігрового інтерфейсу, де зможете розпочати керування енергосистемою України." data-en="To start the game, click the 'Play Now' or 'Start Game' button on the main page of the site. You will be redirected to the game interface where you can begin managing Ukraine's energy system.">Для початку гри натисніть на кнопку "Грати зараз" або "Розпочати гру" на головній сторінці сайту. Ви будете перенаправлені до ігрового інтерфейсу, де зможете розпочати керування енергосистемою України.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span><span class="faq-icon">🎯</span><span data-uk="Яка мета гри?" data-en="What is the goal of the game?">Яка мета гри?</span></span>
+                </div>
+                <div class="faq-answer">
+                    <p data-uk="Головна мета гри - відновлення та підтримка енергосистеми України під час війни. Ви повинні забезпечувати стабільне електропостачання для 33 українських міст, керуючи 9 електростанціями та 50+ лініями електропередач, попри постійні атаки на інфраструктуру." data-en="The main goal of the game is to restore and maintain Ukraine's energy system during wartime. You must ensure stable electricity supply to 33 Ukrainian cities by managing 9 power plants and 50+ transmission lines, despite constant attacks on infrastructure.">Головна мета гри - відновлення та підтримка енергосистеми України під час війни. Ви повинні забезпечувати стабільне електропостачання для 33 українських міст, керуючи 9 електростанціями та 50+ лініями електропередач, попри постійні атаки на інфраструктуру.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span><span class="faq-icon">📱</span><span data-uk="Чи буде мобільна версія?" data-en="Will there be a mobile version?">Чи буде мобільна версія?</span></span>
+                </div>
+                <div class="faq-answer">
+                    <p data-uk="Мобільна версія гри знаходиться в планах розробки, але наразі не є першочерговим завданням. Спочатку ми зосереджуємося на наповненні гри новим контентом, функціями та покращенні ігрового процесу для десктопної версії." data-en="A mobile version of the game is planned for development, but it's not currently a priority. First, we are focusing on filling the game with new content, features and improving gameplay for the desktop version.">Мобільна версія гри знаходиться в планах розробки, але наразі не є першочерговим завданням. Спочатку ми зосереджуємося на наповненні гри новим контентом, функціями та покращенні ігрового процесу для десктопної версії.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span><span class="faq-icon">⚡</span><span data-uk="Що таке система життів?" data-en="What is the lives system?">Що таке система життів?</span></span>
+                </div>
+                <div class="faq-answer">
+                    <p data-uk="У грі є система з 3 життів. Ви втрачаєте одне життя кожного разу, коли будь-яке місто залишається без електроенергії більше 60 секунд. Коли всі життя закінчуються - гра завершується. Це додає напругу та реалістичності до процесу управління енергосистемою." data-en="The game has a system of 3 lives. You lose one life every time any city remains without electricity for more than 60 seconds. When all lives are exhausted - the game ends. This adds tension and realism to the energy system management process.">У грі є система з 3 життів. Ви втрачаєте одне життя кожного разу, коли будь-яке місто залишається без електроенергії більше 60 секунд. Коли всі життя закінчуються - гра завершується. Це додає напругу та реалістичності до процесу управління енергосистемою.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span><span class="faq-icon">🔧</span><span data-uk="Як працюють ремонтні бригади?" data-en="How do repair teams work?">Як працюють ремонтні бригади?</span></span>
+                </div>
+                <div class="faq-answer">
+                    <p data-uk="Ремонтні бригади - це ключовий елемент гри. Вони відновлюють пошкоджені електростанції та лінії електропередач. Ви можете наймати додаткові бригади за накопичену енергію, що збільшує швидкість відновлення інфраструктури після атак." data-en="Repair teams are a key element of the game. They restore damaged power plants and transmission lines. You can hire additional teams using accumulated energy, which increases the speed of infrastructure restoration after attacks.">Ремонтні бригади - це ключовий елемент гри. Вони відновлюють пошкоджені електростанції та лінії електропередач. Ви можете наймати додаткові бригади за накопичену енергію, що збільшує швидкість відновлення інфраструктури після атак.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span><span class="faq-icon">💰</span><span data-uk="Що таке МВт·год і як їх заробити?" data-en="What are MWh and how to earn them?">Що таке МВт·год і як їх заробити?</span></span>
+                </div>
+                <div class="faq-answer">
+                    <p data-uk="МВт·год (мегават-години) - це ігрова валюта, яка представляє накопичену електроенергію. Ви заробляєте МВт·год, коли ваші електростанції працюють та постачають енергію містам. Цю валюту можна витрачати на апгрейди, наймання ремонтних бригад та покращення інфраструктури." data-en="MWh (megawatt-hours) is the game currency that represents accumulated electrical energy. You earn MWh when your power plants operate and supply energy to cities. This currency can be spent on upgrades, hiring repair teams and infrastructure improvements.">МВт·год (мегават-години) - це ігрова валюта, яка представляє накопичену електроенергію. Ви заробляєте МВт·год, коли ваші електростанції працюють та постачають енергію містам. Цю валюту можна витрачати на апгрейди, наймання ремонтних бригад та покращення інфраструктури.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- About Project Section -->
-    <section class="about-project">
+    <section class="about-project" id="about">
         <div class="about-content">
-            <h2>Про проект</h2>
+            <h2 data-uk="Про проект" data-en="About Project">Про проект</h2>
             <div class="about-grid">
                 <div class="about-card">
                     <span class="about-icon">🤖</span>
-                    <h3>Створено з ШІ</h3>
-                    <p>Ця гра розроблена з використанням сучасних технологій штучного інтелекту для створення
-                        реалістичного симулятора енергосистеми України.</p>
+                    <h3 data-uk="Створено з ШІ" data-en="Created with AI">Створено з ШІ</h3>
+                    <p data-uk="Ця гра розроблена з використанням сучасних технологій штучного інтелекту для створення реалістичного симулятора енергосистеми України." data-en="This game is developed using modern artificial intelligence technologies to create a realistic simulator of Ukraine's energy system.">Ця гра розроблена з використанням сучасних технологій штучного інтелекту для створення реалістичного симулятора енергосистеми України.</p>
                 </div>
                 <div class="about-card">
                     <span class="about-icon">👨‍💻</span>
-                    <h3>Автор: Alexey205</h3>
-                    <p>Проект створений з метою висвітлення важливості енергетичної безпеки та складнощів управління
-                        енергосистемою в умовах війни. А також щоб показати можливості ШІ за допомоги доречних запитів.
-                    </p>
+                    <h3 data-uk="Автор: Alexey205" data-en="Author: Alexey205">Автор: Alexey205</h3>
+                    <p data-uk="Проект створений з метою висвітлення важливості енергетичної безпеки та складнощів управління енергосистемою в умовах війни. І також щоб показати можливості ШІ за допомоги доречних запитів." data-en="The project was created to highlight the importance of energy security and the complexities of energy system management during wartime. And also to show the capabilities of AI through relevant queries.">Проект створений з метою висвітлення важливості енергетичної безпеки та складнощів управління енергосистемою в умовах війни. І також щоб показати можливості ШІ за допомоги доречних запитів.</p>
                 </div>
                 <div class="about-card">
                     <span class="about-icon">📂</span>
-                    <h3>Відкритий код</h3>
-                    <p>Проект доступний на GitHub з повним вихідним кодом та документацією для розробників та
-                        дослідників.</p>
+                    <h3 data-uk="Відкритий код" data-en="Open Source">Відкритий код</h3>
+                    <p data-uk="Проект доступний на GitHub з повним вихідним кодом та документацією для розробників та дослідників." data-en="The project is available on GitHub with full source code and documentation for developers and researchers.">Проект доступний на GitHub з повним вихідним кодом та документацією для розробників та дослідників.</p>
                     <a href="https://github.com/Alexey205/Lights-Over-Ukraine" target="_blank" class="github-link">
-                        🔗 GitHub Repository
+                        <span data-uk="🔗 GitHub Repository" data-en="🔗 GitHub Repository">🔗 GitHub Repository</span>
                     </a>
                 </div>
                 <div class="about-card">
                     <span class="about-icon">📜</span>
-                    <h3>Ліцензії</h3>
+                    <h3 data-uk="Ліцензії" data-en="Licenses">Ліцензії</h3>
                     <p>
-                        Картографічні дані: © <a href="https://www.openstreetmap.org/copyright"
-                            target="_blank">OpenStreetMap</a><br>
-                        Базові карти: © <a href="https://carto.com/" target="_blank">CartoDB</a><br>
-                        Кордони України: © <a href="https://www.geoboundaries.org" target="_blank">geoBoundaries</a>,
+                        <span data-uk="Картографічні дані: © " data-en="Cartographic data: © ">Картографічні дані: © </span><a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a><br>
+                        <span data-uk="Базові карти: © " data-en="Base maps: © ">Базові карти: © </span><a href="https://carto.com/" target="_blank">CartoDB</a><br>
+                        <span data-uk="Кордони України: © " data-en="Ukraine borders: © ">Кордони України: © </span><a href="https://www.geoboundaries.org" target="_blank">geoBoundaries</a>,
                         <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a><br>
-                        Карта: © <a href="https://leafletjs.com" target="_blank">Leaflet</a><br>
+                        <span data-uk="Карта: © " data-en="Map: © ">Карта: © </span><a href="https://leafletjs.com" target="_blank">Leaflet</a><br>
                     </p>
                 </div>
             </div>
@@ -882,26 +1144,148 @@
 
     <!-- Call to Action -->
     <section class="cta">
-        <h2>Готові прийняти виклик?</h2>
-        <p>Енергосистема України потребує вашого керівництва. Зможете ви забезпечити стабільне електропостачання під час
-            найскладніших викликів?</p>
-        <a href="base_game.html" class="play-button">⚡ Розпочати гру</a>
+        <h2 data-uk="Готові прийняти виклик?" data-en="Ready to Take the Challenge?">Готові прийняти виклик?</h2>
+        <p data-uk="Енергосистема України потребує вашого керівництва. Зможете ви забезпечити стабільне електропостачання під час найскладніших викликів?" data-en="Ukraine's energy system needs your leadership. Can you ensure stable electricity supply during the most difficult challenges?">Енергосистема України потребує вашого керівництва. Зможете ви забезпечити стабільне електропостачання під час найскладніших викликів?</p>
+        <a href="base_game.html" class="play-button" data-uk="⚡ Розпочати гру" data-en="⚡ Start Game">⚡ Розпочати гру</a>
     </section>
 
-    <footer
-        style="background: rgba(15, 23, 42, 0.9); padding: 2rem; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.1);">
-        <p style="color: rgba(255, 255, 255, 0.7); margin-bottom: 1rem;">
+    <footer style="background: rgba(15, 23, 42, 0.9); padding: 2rem; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+        <p style="color: rgba(255, 255, 255, 0.7); margin-bottom: 1rem;" data-uk="2025 Lights Over Ukraine - Створено Alexey205 з використанням ШІ" data-en="2025 Lights Over Ukraine - Created by Alexey205 using AI">
             2025 Lights Over Ukraine - Створено <strong>Alexey205</strong> з використанням ШІ
         </p>
-        <p style="color: rgba(255, 255, 255, 0.5); font-size: 0.9rem;">
+        <p style="color: rgba(255, 255, 255, 0.5); font-size: 0.9rem;" data-uk="Цей проект присвячений героїчній роботі українських енергетиків" data-en="This project is dedicated to the heroic work of Ukrainian energy workers">
             Цей проект присвячений героїчній роботі українських енергетиків
         </p>
     </footer>
 
     <script>
-        // Smooth scrolling animation
+        // Language switching functionality
+        const translations = {
+            uk: {
+                backToTop: 'Повернутися наверх'
+            },
+            en: {
+                backToTop: 'Back to top'
+            }
+        };
+
+        let currentLang = 'uk';
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+            
+            // Update all elements with data attributes
+            const elements = document.querySelectorAll('[data-uk][data-en]');
+            elements.forEach(element => {
+                const text = element.getAttribute(`data-${lang}`);
+                if (text) {
+                    element.textContent = text;
+                }
+            });
+
+            // Update back to top button title
+            const backToTopBtn = document.getElementById('back-to-top');
+            backToTopBtn.title = translations[lang].backToTop;
+
+            // Update language switcher
+            document.querySelectorAll('.lang-option').forEach(option => {
+                option.classList.toggle('active', option.dataset.lang === lang);
+            });
+
+            // Store preference
+            localStorage.setItem('preferredLanguage', lang);
+        }
+
+        // Initialize language switcher
+        document.getElementById('lang-switcher').addEventListener('click', (e) => {
+            if (e.target.classList.contains('lang-option')) {
+                const lang = e.target.dataset.lang;
+                switchLanguage(lang);
+            }
+        });
+
+        // Load saved language preference
+        const savedLang = localStorage.getItem('preferredLanguage');
+        if (savedLang && savedLang !== 'uk') {
+            switchLanguage(savedLang);
+        }
+
+        // Mobile menu functionality
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const navMenu = document.getElementById('nav-menu');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            mobileMenuBtn.classList.toggle('active');
+        });
+
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                navMenu.classList.remove('active');
+                mobileMenuBtn.classList.remove('active');
+            });
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.nav-container')) {
+                navMenu.classList.remove('active');
+                mobileMenuBtn.classList.remove('active');
+            }
+        });
+
+        // Navbar scroll effect
+        const navbar = document.getElementById('navbar');
+        let lastScrollY = window.scrollY;
+
+        window.addEventListener('scroll', () => {
+            const currentScrollY = window.scrollY;
+            
+            if (currentScrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+
+            lastScrollY = currentScrollY;
+        });
+
+        // Back to top button functionality
+        const backToTopBtn = document.getElementById('back-to-top');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.add('visible');
+            } else {
+                backToTopBtn.classList.remove('visible');
+            }
+        });
+
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Scroll animations
         document.addEventListener('DOMContentLoaded', function () {
-            // Add scroll animations
             const observerOptions = {
                 threshold: 0.1,
                 rootMargin: '0px 0px -50px 0px'
@@ -959,6 +1343,64 @@
 
             animateNumbers();
         });
+
+        // FAQ functionality
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const faqItem = question.closest('.faq-item');
+                const isActive = faqItem.classList.contains('active');
+                
+                // Close all FAQ items
+                document.querySelectorAll('.faq-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                // Open clicked item if it wasn't active
+                if (!isActive) {
+                    faqItem.classList.add('active');
+                }
+            });
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                navMenu.classList.remove('active');
+                mobileMenuBtn.classList.remove('active');
+            }
+        });
+
+        // Performance optimization: throttle scroll events
+        function throttle(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Apply throttling to scroll events
+        const throttledScrollHandler = throttle(() => {
+            const currentScrollY = window.scrollY;
+            
+            if (currentScrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+
+            if (currentScrollY > 300) {
+                backToTopBtn.classList.add('visible');
+            } else {
+                backToTopBtn.classList.remove('visible');
+            }
+        }, 16); // ~60fps
+
+        window.addEventListener('scroll', throttledScrollHandler);
     </script>
 </body>
 
