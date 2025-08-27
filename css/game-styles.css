@@ -1172,3 +1172,424 @@ body {
         font-size: 14px;
     }
 }
+
+/* Мобільна адаптація */
+@media (max-width: 768px) {
+
+    /* Основні налаштування для мобільних */
+    body {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        overflow: hidden;
+    }
+
+    /* ПАНЕЛЬ УПРАВЛІННЯ - зменшена та краще розташована */
+    .panel {
+        width: calc(100vw - 16px);
+        left: 8px;
+        right: 8px;
+        bottom: 8px;
+        max-height: 45vh;
+        /* Зменшено з 60vh */
+        font-size: 14px;
+        /* Зменшено шрифт */
+    }
+
+    .panel.collapsed {
+        transform: translateY(calc(105%));
+        /* Краще приховування */
+    }
+
+    .panel-content {
+        max-height: calc(35vh - 80px);
+        /* Зменшено висоту контенту */
+        overflow-y: auto;
+        padding: 12px;
+        /* Зменшено padding */
+    }
+
+    /* Вкладки - компактніші */
+    .tab {
+        padding: 10px 4px;
+        /* Зменшено padding */
+        font-size: 12px;
+        /* Менший шрифт */
+        min-height: 40px;
+        /* Зменшено висоту */
+    }
+
+    /* Кнопки апгрейдів - компактніші */
+    .upgrade-btn {
+        padding: 12px;
+        /* Зменшено padding */
+        margin: 6px 0;
+        /* Зменшено відступи */
+        min-height: 50px;
+        /* Зменшено висоту */
+        font-size: 14px;
+        /* Менший шрифт */
+        touch-action: manipulation;
+    }
+
+    .upgrade-header {
+        margin-bottom: 4px;
+    }
+
+    .upgrade-icon {
+        font-size: 16px;
+        /* Менші іконки */
+    }
+
+    .upgrade-cost {
+        font-size: 12px;
+        /* Менший шрифт для вартості */
+        padding: 1px 6px;
+    }
+
+    .upgrade-effect {
+        font-size: 11px;
+        /* Менший текст ефектів */
+        padding-left: 20px;
+    }
+
+    /* Ресурсна панель - компактніша */
+    .resource-panel {
+        padding: 10px 12px;
+        /* Зменшено padding */
+    }
+
+    .resource-icon {
+        font-size: 20px;
+        /* Зменшено розмір іконки */
+    }
+
+    .resource-amount {
+        font-size: 16px;
+        /* Зменшено шрифт */
+    }
+
+    .income-rate {
+        font-size: 12px;
+        /* Зменшено шрифт */
+    }
+
+    /* Статусна панель - компактніша */
+    .status-panel {
+        padding: 10px;
+        /* Зменшено padding */
+        margin-bottom: 8px;
+    }
+
+    .status-item {
+        padding: 6px 0;
+        /* Зменшено відступи */
+        font-size: 13px;
+    }
+
+    .status-label {
+        font-size: 12px;
+    }
+
+    .status-value {
+        font-size: 13px;
+    }
+
+    .station-status {
+        margin-bottom: 3px;
+        gap: 6px;
+    }
+
+    .station-name {
+        font-size: 11px;
+    }
+
+    .station-count {
+        font-size: 11px;
+    }
+
+    /* Події - компактніші */
+    .events-history {
+        max-height: 120px;
+        /* Зменшено висоту */
+        padding: 6px;
+    }
+
+    .event-item {
+        padding: 4px 0;
+        font-size: 11px;
+    }
+
+    .event-filters {
+        gap: 2px;
+        margin-bottom: 6px;
+    }
+
+    .event-filter {
+        padding: 2px 6px;
+        font-size: 9px;
+    }
+
+    /* ПАНЕЛЬ ЕТАПУ - значно компактніша */
+    #victory-progress {
+        top: 55px;
+        left: 50%;
+        transform: translateX(-50%);
+        /* Повертаємо центрування */
+        min-width: auto;
+        width: 280px;
+        /* Фіксована ширина замість 100% */
+        max-width: calc(100vw - 40px);
+        /* Але не більше екрану */
+        font-size: 11px;
+        padding: 6px 10px;
+        /* Ще менший padding */
+        border-left-width: 2px;
+    }
+
+    #victory-progress .stage-header {
+        font-size: 11px;
+        /* Ще менший заголовок */
+        margin-bottom: 3px;
+    }
+
+    #victory-progress .stage-description {
+        margin-bottom: 4px;
+        font-size: 9px;
+        /* Дуже маленький опис */
+    }
+
+    #victory-progress .stage-timer {
+        font-size: 9px;
+    }
+
+    .victory-progress-bar {
+        height: 3px;
+        /* Ще тонший прогрес-бар */
+        margin: 3px 0;
+    }
+
+    /* СПОВІЩЕННЯ - значно менші */
+    #toast-container {
+        top: 100px;
+        right: 10px;
+        left: auto;
+        /* Прибираємо left для right-align */
+        max-width: 250px;
+        /* Фіксована максимальна ширина */
+        gap: 3px;
+        /* Менші відступи між toast */
+    }
+
+    .toast {
+        font-size: 11px;
+        /* Ще менший шрифт */
+        padding: 6px 8px;
+        /* Менший padding */
+        max-width: 250px;
+        /* Максимальна ширина toast */
+        border-left-width: 2px;
+        border-radius: 6px;
+        /* Менший border-radius */
+    }
+
+    .toast-icon {
+        font-size: 12px;
+        /* Менші іконки */
+    }
+
+    .toast-content {
+        line-height: 1.2;
+    }
+
+    .toast-title {
+        font-size: 11px;
+        margin-bottom: 1px;
+    }
+
+    .toast-message {
+        font-size: 10px;
+        /* Дуже маленький текст */
+        line-height: 1.1;
+    }
+
+    .toast-progress {
+        height: 2px;
+        /* Тонший прогрес */
+    }
+
+    /* Життя та час гри - компактніші */
+    #lives-container {
+        top: 8px;
+        left: 8px;
+        padding: 6px 10px;
+    }
+
+    .life {
+        font-size: 18px;
+    }
+
+    #game-time-container {
+        top: 8px;
+        right: 8px;
+        padding: 6px 8px;
+        font-size: 11px;
+    }
+
+    #game-time {
+        font-size: 13px;
+    }
+
+    /* Кнопка перемикання панелі */
+    .panel-toggle {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+        bottom: 8px;
+    }
+
+    /* Зменшені маркери для мобільних */
+    .city-marker {
+        transform: scale(0.7);
+    }
+
+    .power-station {
+        transform: scale(0.8);
+    }
+
+    /* FAQ екран */
+    #game-over {
+        padding: 16px;
+        text-align: center;
+    }
+
+    #game-over h2 {
+        font-size: 24px;
+        margin-bottom: 16px;
+    }
+
+    #restart-button {
+        padding: 12px 24px;
+        font-size: 14px;
+        min-height: 44px;
+    }
+}
+
+/* Для дуже маленьких екранів */
+@media (max-width: 480px) {
+    .panel {
+        width: calc(100vw - 12px);
+        left: 6px;
+        right: 6px;
+        max-height: 40vh;
+        /* Ще менше */
+        font-size: 13px;
+    }
+
+    .panel.collapsed {
+        transform: translateY(calc(105%));
+        /* Краще приховування */
+    }
+
+    .panel-content {
+        max-height: calc(30vh - 70px);
+        padding: 10px;
+    }
+
+    .tab {
+        padding: 8px 2px;
+        font-size: 11px;
+        min-height: 36px;
+    }
+
+    .upgrade-btn {
+        padding: 10px;
+        min-height: 45px;
+        font-size: 13px;
+    }
+
+    .resource-amount {
+        font-size: 15px;
+    }
+
+    /* Ще менші сповіщення */
+    #toast-container {
+        max-width: 220px;
+        /* Менше для маленьких екранів */
+    }
+
+    .toast {
+        font-size: 10px;
+        padding: 5px 7px;
+        max-width: 220px;
+    }
+
+    .toast-icon {
+        font-size: 11px;
+    }
+
+    .toast-title {
+        font-size: 10px;
+    }
+
+    .toast-message {
+        font-size: 9px;
+    }
+
+    /* Ще компактніша панель етапу */
+    #victory-progress {
+        width: 260px;
+        /* Трохи менше */
+        max-width: calc(100vw - 20px);
+        font-size: 10px;
+        padding: 5px 8px;
+    }
+
+    #victory-progress .stage-header {
+        font-size: 10px;
+    }
+
+    #victory-progress .stage-description {
+        font-size: 8px;
+    }
+}
+
+/* Landscape орієнтація на мобільних */
+@media (max-height: 500px) and (orientation: landscape) {
+    .panel {
+        max-height: 35vh;
+    }
+
+    .panel-content {
+        max-height: calc(25vh - 60px);
+    }
+
+    #victory-progress {
+        top: 45px;
+        font-size: 10px;
+        padding: 6px 10px;
+    }
+
+    #toast-container {
+        top: 80px;
+    }
+
+    .toast {
+        font-size: 11px;
+        padding: 6px 8px;
+    }
+
+    #lives-container {
+        top: 6px;
+        padding: 4px 8px;
+    }
+
+    #game-time-container {
+        top: 6px;
+        padding: 4px 6px;
+        font-size: 10px;
+    }
+}

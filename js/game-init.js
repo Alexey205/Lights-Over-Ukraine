@@ -11,7 +11,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Ініціалізація карти
 function initializeMap() {
-    map = L.map('map').setView([48.5, 31], 6);
+    map = L.map('map', {
+        zoomControl: false // Відключаємо стандартний контроль зуму
+    }).setView([48.5, 31], 6);
+
+    // Додаємо контроль зуму в правому нижньому куті
+    L.control.zoom({
+        position: 'bottomright'
+    }).addTo(map);
 
     // Базовий шар карти
     L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
@@ -286,6 +293,9 @@ function startGame() {
     setTimeout(() => {
         showVictoryStageMessage();
     }, 7000);
+
+    initMobileSupport();
+    initMobileMarkerHandlers();
 }
 
 // Функції для роботи з містами
@@ -665,4 +675,145 @@ function showGameOverScreen() {
 
     // Перепідключаємо обробник кнопки
     document.getElementById('restart-button').addEventListener('click', restartGame);
+}
+
+// Мобільна адаптація - обробка дотиків
+function initMobileSupport() {
+    // Перевірка чи це мобільний пристрій
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    if (isMobile) {
+        // Додаємо клас для мобільних пристроїв
+        document.body.classList.add('mobile-device');
+
+        // Обробка подвійного дотику для зуму карти
+        let lastTap = 0;
+        map.getContainer().addEventListener('touchend', function (e) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            if (tapLength < 500 && tapLength > 0) {
+                // Подвійний дотик - відключаємо зум
+                e.preventDefault();
+            }
+            lastTap = currentTime;
+        });
+
+        // Покращена обробка кліків на маркерах
+        map.on('click', function (e) {
+            // Додаємо невелику затримку для кращої обробки на мобільних
+            setTimeout(() => {
+                // Обробка кліків буде відбуватися через існуючі обробники
+            }, 50);
+        });
+
+        // Оптимізація для панелі
+        const panel = document.getElementById('mainPanel');
+        const toggleBtn = document.getElementById('togglePanel');
+
+        // Свайп-жести для панелі
+        let startY = 0;
+        let currentY = 0;
+        let isScrolling = false;
+
+        panel.addEventListener('touchstart', function (e) {
+            startY = e.touches[0].clientY;
+            isScrolling = false;
+        }, { passive: true });
+
+        panel.addEventListener('touchmove', function (e) {
+            if (!startY) return;
+
+            currentY = e.touches[0].clientY;
+            const diffY = startY - currentY;
+
+            // Визначаємо напрямок свайпу
+            if (Math.abs(diffY) > 10) {
+                isScrolling = true;
+            }
+        }, { passive: true });
+
+        panel.addEventListener('touchend', function (e) {
+            if (!isScrolling || !startY || !currentY) return;
+
+            const diffY = startY - currentY;
+
+            // Свайп вгору - згорнути панель
+            if (diffY > 50 && !panel.classList.contains('collapsed')) {
+                panel.classList.add('collapsed');
+                toggleBtn.textContent = '⚙️';
+                toggleBtn.style.left = '10px';
+            }
+            // Свайп вниз - розгорнути панель
+            else if (diffY < -50 && panel.classList.contains('collapsed')) {
+                panel.classList.remove('collapsed');
+                toggleBtn.textContent = '✕';
+                toggleBtn.style.left = 'calc(100vw - 50px)';
+            }
+
+            startY = 0;
+            currentY = 0;
+            isScrolling = false;
+        });
+    }
+}
+
+// Покращені обробники для мобільних маркерів
+function initMobileMarkerHandlers() {
+    // Покращені обробники для електростанцій
+    Object.entries(powerStationMarkers).forEach(([name, ps]) => {
+        ps.marker.off('click'); // Видаляємо старий обробник
+        ps.marker.on('click', function (e) {
+            e.originalEvent.preventDefault();
+            e.originalEvent.stopPropagation();
+
+            // Додаємо вібрацію на мобільних (якщо підтримується)
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+
+            repairPowerStation(name);
+            updatePowerStationTooltip(name);
+        });
+    });
+
+    // Покращені обробники для ліній
+    lineLayers.forEach(conn => {
+        conn.damageMarker.off('click');
+        conn.damageMarker.on('click', function (e) {
+            e.originalEvent.preventDefault();
+            e.originalEvent.stopPropagation();
+
+            if (!conn.damaged || repairTeams <= 0) return;
+
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+
+            if (lineUpgrades.autoRepair.unlocked && conn.repairTimer) {
+                showNotification("Автоматичний ремонт вже виконує цю роботу!", 'warning');
+                return;
+            }
+
+            repairTeams--;
+            updateTeamStatus();
+
+            if (conn.repairTimer) {
+                clearTimeout(conn.repairTimer);
+                conn.repairTimer = null;
+            }
+
+            const repairTime = repairTimes['line'] * difficultyMultiplier *
+                lineUpgrades.repairTimes[lineUpgrades.level];
+
+            showProgressBar(conn.damageMarker.getLatLng(), repairTime, () => {
+                repairLine(conn);
+                repairTeams++;
+                updateTeamStatus();
+
+                if (lineUpgrades.autoRepair.unlocked) {
+                    startAutoRepair();
+                }
+            });
+        });
+    });
 }
