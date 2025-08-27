@@ -200,7 +200,7 @@ function initializeUI() {
             tab.classList.add('active');
             const contentId = tab.getAttribute('data-tab') + 'Content';
             document.getElementById(contentId).classList.add('active');
-            
+
             // Оновлюємо історію подій при відкритті вкладки
             if (tab.getAttribute('data-tab') === 'events') {
                 updateEventsPanel();
@@ -230,37 +230,37 @@ function initializeNotificationSystem() {
 
     // Ініціалізуємо фільтри подій
     initializeEventFilters();
-    
+
     // Розтягуємо вітальні сповіщення в часі
     setTimeout(() => {
         showNotification("Вітаємо у грі! Захистіть енергосистему України.", 'info', 'Початок гри');
     }, 500);
-    
+
     setTimeout(() => {
         showNotification("Використовуйте ремонтні бригади для відновлення пошкоджених об'єктів", 'info', 'Підказка');
     }, 2500);
-    
-    setTimeout(() => {
-        showNotification("Накопичуйте енергію та купуйте покращення для захисту", 'info', 'Стратегія');
-    }, 4500);
-    
+
+    // setTimeout(() => {
+    //     showNotification("Накопичуйте енергію та купуйте покращення для захисту", 'info', 'Стратегія');
+    // }, 4500);
+
     setTimeout(() => {
         showNotification("Перша атака почнеться незабаром. Будьте готові!", 'warning', 'Увага');
-    }, 6500);
+    }, 4500);
 }
 
 // Ініціалізація фільтрів подій
 function initializeEventFilters() {
     const filters = document.querySelectorAll('.event-filter');
-    
+
     filters.forEach(filter => {
         filter.addEventListener('click', () => {
             // Знімаємо активний клас з усіх фільтрів
             filters.forEach(f => f.classList.remove('active'));
-            
+
             // Додаємо активний клас до обраного
             filter.classList.add('active');
-            
+
             // Оновлюємо панель подій
             updateEventsPanel();
         });
@@ -276,8 +276,12 @@ function startGame() {
     balanceUpdateInterval = setInterval(updateBalancePeriodically, 1000);
     scheduleNextAttack();
     updateLivesDisplay();
+
+    // Запускаємо таймер гри
+    startGameTimer();
+
     updateVictoryUI();
-    
+
     // Затримуємо показ етапу щоб не змішувався з вітальними повідомленнями
     setTimeout(() => {
         showVictoryStageMessage();
@@ -367,13 +371,13 @@ function updateCityPowerStatus() {
                 resetCityHealth(city);
                 updateCityHealthIndicator(city, false);
                 updateCityVisual(city, 'city-marker powered');
-                showNotification(`${city} відновлено електропостачання`, 'repair');
+                //showNotification(`${city} відновлено електропостачання`, 'repair');
             } else {
                 resetCityHealth(city);
                 updateCityHealthIndicator(city, true);
                 startHealthDecrease(city);
                 updateCityVisual(city, 'city-marker unpowered');
-                showNotification(`${city} втратив електропостачання!`, 'attack');
+                //showNotification(`${city} втратив електропостачання!`, 'attack');
             }
         }
     }
@@ -456,10 +460,17 @@ function showVictoryStageMessage() {
 // Досягнення перемоги
 function achieveVictory() {
     isVictorious = true;
+    isGameRunning = false; // Зупиняємо всі процеси гри
+
+    // Зупиняємо всі таймери та інтервали
     clearInterval(balanceUpdateInterval);
+    clearInterval(gameTimer);
     clearTimeout(attackTimeout);
 
-    // Показуємо екран перемоги
+    // Зупиняємо всі активні ремонти
+    clearAllAutoRepairs();
+
+    // Показуємо екран перемоги з статистикою
     showVictoryScreen();
 }
 
@@ -486,10 +497,20 @@ function showVictoryScreen() {
     victoryScreen.innerHTML = `
         <h1 style="font-size: 48px; margin-bottom: 20px; text-shadow: 0 0 20px #00ff00;">🎉 ПЕРЕМОГА! 🎉</h1>
         <h2 style="font-size: 24px; margin-bottom: 30px;">Енергосистема України відновлена!</h2>
-        <div style="background: rgba(0,0,0,0.5); padding: 20px; border-radius: 10px; text-align: center;">
-            <p>✅ Всі міста підключені до мережі</p>
-            <p>⚡ Накопичено ${Math.floor(energyResources)} МВт·год</p>
-            <p>🛡️ Система стабілізована</p>
+        <div style="background: rgba(0,0,0,0.5); padding: 25px; border-radius: 15px; text-align: center; max-width: 500px;">
+            <h3 style="color: #FFD700; margin-bottom: 20px; font-size: 20px;">📊 Фінальна статистика</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left;">
+                <div>⏱️ Час гри:</div><div><b>${formatGameTime(gameTimeSeconds)}</b></div>
+                <div>⚡ Накопичено енергії:</div><div><b>${Math.floor(energyResources)} МВт·год</b></div>
+                <div>🛡️ Пережито атак:</div><div><b>${survivedAttacks}</b></div>
+                <div>👷 Ремонтних бригад:</div><div><b>${repairTeams}</b></div>
+                <div>🔧 Рівень ліній:</div><div><b>${lineUpgrades.levels[lineUpgrades.level]}</b></div>
+                <div>🏆 Етапів пройдено:</div><div><b>${currentStage + 1}/3</b></div>
+            </div>
+            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.3);">
+                <p style="color: #4CAF50; font-weight: bold;">✅ Всі міста підключені до мережі</p>
+                <p style="color: #4CAF50; font-weight: bold;">✅ Система стабілізована</p>
+            </div>
         </div>
         <button id="victory-restart" style="
             margin-top: 30px;
@@ -578,4 +599,70 @@ function updateVictoryUI() {
     } else {
         timer.textContent = '';
     }
+}
+
+// Функція запуску таймера гри
+function startGameTimer() {
+    gameTimeSeconds = 0;
+    gameTimer = setInterval(() => {
+        if (isGameRunning && !isGameOver && !isVictorious) {
+            gameTimeSeconds++;
+            updateGameTimeDisplay();
+        }
+    }, 1000);
+}
+
+// Оновлення відображення часу гри
+function updateGameTimeDisplay() {
+    const minutes = Math.floor(gameTimeSeconds / 60);
+    const seconds = gameTimeSeconds % 60;
+    const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+    // Оновлюємо відображення в UI (буде додано в наступному кроці)
+    const gameTimeEl = document.getElementById('game-time');
+    if (gameTimeEl) {
+        gameTimeEl.textContent = timeString;
+    }
+}
+
+// Функція форматування часу
+function formatGameTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes}:${secs.toString().padStart(2, '0')}`;
+}
+
+// Покращена функція показу екрану поразки
+function showGameOverScreen() {
+    const gameOverScreen = document.getElementById('game-over');
+
+    // Додаємо статистику до існуючого екрану
+    const existingContent = gameOverScreen.innerHTML;
+    gameOverScreen.innerHTML = `
+        <h2>🔴 Гру завершено!</h2>
+        <p>Ви втратили всі життя</p>
+        <div style="background: rgba(0,0,0,0.5); padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0;">
+            <h3 style="color: #FFD700; margin-bottom: 15px;">📊 Статистика гри</h3>
+            <p>⏱️ Час гри: ${formatGameTime(gameTimeSeconds)}</p>
+            <p>⚡ Накопичено енергії: ${Math.floor(energyResources)} МВт·год</p>
+            <p>🛡️ Пережито атак: ${survivedAttacks}</p>
+            <p>👷 Ремонтних бригад: ${repairTeams}</p>
+            <p>🔧 Рівень ліній: ${lineUpgrades.levels[lineUpgrades.level]}</p>
+        </div>
+        <button id="restart-button" style="
+            padding: 12px 24px;
+            font-size: 18px;
+            background: #F44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        ">Спробувати знову</button>
+    `;
+
+    gameOverScreen.style.display = 'flex';
+
+    // Перепідключаємо обробник кнопки
+    document.getElementById('restart-button').addEventListener('click', restartGame);
 }

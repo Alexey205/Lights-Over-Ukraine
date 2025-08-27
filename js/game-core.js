@@ -20,6 +20,8 @@ let lives = 3;
 const maxLives = 3;
 let isGameOver = false;
 let attackTimeout;
+let gameTimer = null;
+let gameTimeSeconds = 0;
 
 // Система етапів перемоги
 let currentStage = 0;
@@ -335,7 +337,7 @@ function repairLine(line) {
 
 // Функція симуляції атаки
 function simulateAttack() {
-    if (!isGameRunning) return;
+    if (!isGameRunning || isGameOver || isVictorious) return;
 
     let attackExecuted = false;
     const now = Date.now();
@@ -392,6 +394,9 @@ function simulateAttack() {
                     }
                 }
             } else {
+                // Атака не пройшла - показуємо ефект щита
+                createShieldEffect(randomLine.damageMarker.getLatLng());
+                createParticleEffect(randomLine.damageMarker.getLatLng(), 'shield');
                 showNotification("Атака відбита! Міцні лінії витримали удар.", 'info', 'Захист спрацював');
             }
         }
@@ -403,33 +408,45 @@ function simulateAttack() {
 
         if (workingStations.length > 0) {
             const randomStation = workingStations[Math.floor(Math.random() * workingStations.length)];
-            randomStation.damaged = true;
 
-            // Створення ефекту пожежі
-            const fireContainer = L.DomUtil.create('div', '');
-            fireContainer.innerHTML = '<span style="font-size:20px;line-height:20px;color:#ff5722;text-shadow:0 0 10px #ff5722;">🔥</span>';
+            // Перевіряємо, чи пройде атака (можна додати логіку залежно від апгрейдів)
+            const attackSuccess = Math.random() < 0.8; // 80% шанс успішної атаки на ТЕС
 
-            randomStation.fire = L.marker(randomStation.marker.getLatLng(), {
-                icon: L.divIcon({
-                    className: '',
-                    html: fireContainer.outerHTML,
-                    iconSize: [20, 20],
-                    iconAnchor: [10, 20]
-                }),
-                zIndexOffset: 2001
-            }).addTo(map);
+            if (attackSuccess) {
+                randomStation.damaged = true;
 
-            // Оновлення класу станції
-            const stationName = Object.keys(powerStationMarkers).find(name => powerStationMarkers[name] === randomStation);
-            updatePowerStationVisual(stationName, true);
+                // Створення ефекту пожежі
+                const fireContainer = L.DomUtil.create('div', '');
+                fireContainer.innerHTML = '<span style="font-size:20px;line-height:20px;color:#ff5722;text-shadow:0 0 10px #ff5722;">🔥</span>';
 
-            // Ефекти атаки
-            createLightningEffect(randomStation.marker.getLatLng());
-            createParticleEffect(randomStation.marker.getLatLng(), 'damage');
+                randomStation.fire = L.marker(randomStation.marker.getLatLng(), {
+                    icon: L.divIcon({
+                        className: '',
+                        html: fireContainer.outerHTML,
+                        iconSize: [20, 20],
+                        iconAnchor: [10, 20]
+                    }),
+                    zIndexOffset: 2001
+                }).addTo(map);
 
-            showAttackNotification(`${randomStation.type} "${stationName}" пошкоджено!`);
+                // Оновлення класу станції
+                const stationName = Object.keys(powerStationMarkers).find(name => powerStationMarkers[name] === randomStation);
+                updatePowerStationVisual(stationName, true);
 
-            attackExecuted = true;
+                // Ефекти атаки
+                createLightningEffect(randomStation.marker.getLatLng());
+                createParticleEffect(randomStation.marker.getLatLng(), 'damage');
+
+                showAttackNotification(`${randomStation.type} "${stationName}" пошкоджено!`);
+
+                attackExecuted = true;
+            } else {
+                // Атака не пройшла - показуємо ефект щита
+                const stationName = Object.keys(powerStationMarkers).find(name => powerStationMarkers[name] === randomStation);
+                createShieldEffect(randomStation.marker.getLatLng());
+                createParticleEffect(randomStation.marker.getLatLng(), 'shield');
+                showNotification(`${randomStation.type} "${stationName}" витримала атаку!`, 'info', 'Захист станції');
+            }
         }
     }
 
@@ -478,6 +495,8 @@ function simulateAttack() {
 
 // Функція для планування наступної атаки
 function scheduleNextAttack() {
+    if (!isGameRunning || isGameOver || isVictorious) return;
+    
     const now = Date.now();
     const timeSinceLast = now - lastAttackTime;
     const timeSinceStart = (now - gameStartTime) / 1000; // у секундах
@@ -519,9 +538,19 @@ function loseLife() {
 // Функція завершення гри
 function endGame() {
     isGameOver = true;
-    document.getElementById('game-over').style.display = 'flex';
+    isGameRunning = false; // Зупиняємо всі процеси гри
+
+    // Зупиняємо всі таймери та інтервали
     clearInterval(balanceUpdateInterval);
+    clearInterval(gameTimer);
     clearTimeout(attackTimeout);
+
+    // Зупиняємо всі активні ремонти
+    clearAllAutoRepairs();
+
+    // Показуємо екран поразки з статистикою
+    showGameOverScreen();
+
     showNotification("Гра завершена! Ви втратили всі життя.", 'warning', 'Кінець гри');
 }
 

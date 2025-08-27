@@ -18,10 +18,10 @@ const eventTypes = {
 function showNotification(message, type = 'info', title = null, duration = 4000) {
     // Додаємо подію до історії
     addEventToHistory(message, type, title);
-    
+
     // Показуємо toast
     showToast(message, type, title, duration);
-    
+
     // Оновлюємо панель історії
     updateEventsPanel();
 }
@@ -42,10 +42,10 @@ function showToast(message, type = 'info', title = null, duration = 4000) {
 
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
-    
+
     const eventType = eventTypes[type] || eventTypes.info;
     const toastTitle = title || eventType.title;
-    
+
     toast.innerHTML = `
         <div class="toast-icon">${eventType.icon}</div>
         <div class="toast-content">
@@ -87,15 +87,15 @@ function showToast(message, type = 'info', title = null, duration = 4000) {
 // Функція видалення toast
 function removeToast(toast) {
     if (!toast || !toast.parentNode) return;
-    
+
     toast.classList.add('hide');
     currentToasts--;
-    
+
     setTimeout(() => {
         if (toast.parentNode) {
             toast.parentNode.removeChild(toast);
         }
-        
+
         // Показуємо наступний toast з черги
         if (toastQueue.length > 0) {
             const next = toastQueue.shift();
@@ -114,9 +114,9 @@ function addEventToHistory(message, type, title = null) {
         timestamp: new Date(),
         time: formatTime(new Date())
     };
-    
+
     eventsHistory.unshift(event); // Додаємо на початок
-    
+
     // Обмежуємо історію до 100 подій
     if (eventsHistory.length > 100) {
         eventsHistory = eventsHistory.slice(0, 100);
@@ -136,8 +136,8 @@ function updateEventsPanel() {
     if (!historyContainer) return;
 
     const activeFilter = document.querySelector('.event-filter.active')?.dataset.filter || 'all';
-    const filteredEvents = activeFilter === 'all' 
-        ? eventsHistory 
+    const filteredEvents = activeFilter === 'all'
+        ? eventsHistory
         : eventsHistory.filter(event => event.type === activeFilter);
 
     if (filteredEvents.length === 0) {
@@ -158,7 +158,7 @@ function updateEventsPanel() {
         `;
     }).join('');
 
-    historyContainer.innerHTML = eventsHTML + 
+    historyContainer.innerHTML = eventsHTML +
         `<div class="events-count">Показано ${filteredEvents.length} з ${eventsHistory.length} подій</div>`;
 }
 
@@ -193,7 +193,8 @@ function createParticleEffect(latLng, type = 'repair') {
     const colors = {
         repair: ['#4CAF50', '#8BC34A', '#CDDC39'],
         damage: ['#FF5722', '#FF9800', '#FFC107'],
-        upgrade: ['#9C27B0', '#E91E63', '#2196F3']
+        upgrade: ['#9C27B0', '#E91E63', '#2196F3'],
+        shield: ['#2196F3', '#03A9F4', '#00BCD4']
     };
 
     const particleColors = colors[type] || colors.repair;
@@ -281,6 +282,26 @@ function createUpgradeEffect(latLng) {
     setTimeout(() => {
         map.removeLayer(marker);
     }, 2000);
+}
+
+// Функція для створення ефекту захисту (щит)
+function createShieldEffect(latLng) {
+    const container = L.DomUtil.create('div', '');
+    container.innerHTML = '<span style="font-size:32px;color:#2196F3;text-shadow:0 0 15px #2196F3;">🛡️</span>';
+    container.style.animation = 'shieldEffect 1.8s ease-out forwards';
+
+    const icon = L.divIcon({
+        className: '',
+        html: container.outerHTML,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16]
+    });
+
+    const marker = L.marker(latLng, { icon }).addTo(map);
+
+    setTimeout(() => {
+        map.removeLayer(marker);
+    }, 1800);
 }
 
 // Функція для відображення прогрес-бару
