@@ -1,13 +1,22 @@
 html,
 body {
     margin: 0;
+    padding: 0;
     height: 100%;
-    overflow-x: hidden;
+    overflow: hidden;
+    /* Заборона прокрутки */
+    position: fixed;
+    /* Фіксуємо позицію */
+    width: 100%;
 }
 
 #map {
     height: 100vh;
     width: 100vw;
+    position: fixed;
+    /* Фіксуємо карту */
+    top: 0;
+    left: 0;
 }
 
 /* Покращені стилі для міст */
@@ -1175,6 +1184,21 @@ body {
 
 /* Мобільна адаптація */
 @media (max-width: 768px) {
+    html {
+        overflow: hidden;
+        position: fixed;
+        height: 100%;
+        width: 100%;
+    }
+    
+    body {
+        overflow: hidden;
+        position: fixed;
+        height: 100%;
+        width: 100%;
+        -webkit-overflow-scrolling: none;
+        overscroll-behavior: none; /* Заборона overscroll ефектів */
+    }
 
     /* Основні налаштування для мобільних */
     body {
@@ -1185,6 +1209,8 @@ body {
         -ms-user-select: none;
         user-select: none;
         overflow: hidden;
+        -webkit-overscroll-behavior: none;
+        overscroll-behavior: none;
     }
 
     /* ПАНЕЛЬ УПРАВЛІННЯ - зменшена та краще розташована */

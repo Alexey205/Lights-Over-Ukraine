@@ -681,14 +681,14 @@ function showGameOverScreen() {
 function initMobileSupport() {
     // Перевірка чи це мобільний пристрій
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
+    
     if (isMobile) {
         // Додаємо клас для мобільних пристроїв
         document.body.classList.add('mobile-device');
-
+        
         // Обробка подвійного дотику для зуму карти
         let lastTap = 0;
-        map.getContainer().addEventListener('touchend', function (e) {
+        map.getContainer().addEventListener('touchend', function(e) {
             const currentTime = new Date().getTime();
             const tapLength = currentTime - lastTap;
             if (tapLength < 500 && tapLength > 0) {
@@ -697,83 +697,13 @@ function initMobileSupport() {
             }
             lastTap = currentTime;
         });
-
+        
         // Покращена обробка кліків на маркерах
-        map.on('click', function (e) {
+        map.on('click', function(e) {
             // Додаємо невелику затримку для кращої обробки на мобільних
             setTimeout(() => {
                 // Обробка кліків буде відбуватися через існуючі обробники
             }, 50);
-        });
-
-        // Оптимізація для панелі
-        const panel = document.getElementById('mainPanel');
-        const toggleBtn = document.getElementById('togglePanel');
-
-        // Свайп-жести для панелі
-        // Покращені свайп-жести тільки для заголовка панелі
-        let startY = 0;
-        let currentY = 0;
-        let isSwipeGesture = false;
-        let startTime = 0;
-
-        // Додаємо обробники тільки до вкладок панелі (не до контенту)
-        const panelTabs = panel.querySelector('.panel-tabs');
-
-        panelTabs.addEventListener('touchstart', function (e) {
-            startY = e.touches[0].clientY;
-            startTime = Date.now();
-            isSwipeGesture = false;
-        }, { passive: true });
-
-        panelTabs.addEventListener('touchmove', function (e) {
-            if (!startY) return;
-
-            currentY = e.touches[0].clientY;
-            const diffY = startY - currentY;
-            const diffTime = Date.now() - startTime;
-
-            // Визначаємо що це жест свайпу (швидкий рух)
-            if (Math.abs(diffY) > 15 && diffTime < 300) {
-                isSwipeGesture = true;
-            }
-        }, { passive: true });
-
-        panelTabs.addEventListener('touchend', function (e) {
-            if (!isSwipeGesture || !startY || !currentY) {
-                startY = 0;
-                currentY = 0;
-                isSwipeGesture = false;
-                return;
-            }
-
-            const diffY = startY - currentY;
-
-            // Свайп вгору - згорнути панель
-            if (diffY > 30 && !panel.classList.contains('collapsed')) {
-                panel.classList.add('collapsed');
-                toggleBtn.textContent = '⚙️';
-                toggleBtn.style.left = '10px';
-            }
-            // Свайп вниз - розгорнути панель
-            else if (diffY < -30 && panel.classList.contains('collapsed')) {
-                panel.classList.remove('collapsed');
-                toggleBtn.textContent = '✕';
-                toggleBtn.style.left = 'calc(100vw - 50px)';
-            }
-
-            startY = 0;
-            currentY = 0;
-            isSwipeGesture = false;
-        });
-
-        // Додатково: блокуємо закриття панелі при прокрутці контенту
-        const panelContent = panel.querySelectorAll('.panel-content');
-        panelContent.forEach(content => {
-            content.addEventListener('touchstart', function (e) {
-                // Зупиняємо поширення події щоб не спрацьовував свайп
-                e.stopPropagation();
-            }, { passive: true });
         });
     }
 }
