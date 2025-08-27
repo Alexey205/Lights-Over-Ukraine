@@ -711,40 +711,52 @@ function initMobileSupport() {
         const toggleBtn = document.getElementById('togglePanel');
 
         // Свайп-жести для панелі
+        // Покращені свайп-жести тільки для заголовка панелі
         let startY = 0;
         let currentY = 0;
-        let isScrolling = false;
+        let isSwipeGesture = false;
+        let startTime = 0;
 
-        panel.addEventListener('touchstart', function (e) {
+        // Додаємо обробники тільки до вкладок панелі (не до контенту)
+        const panelTabs = panel.querySelector('.panel-tabs');
+
+        panelTabs.addEventListener('touchstart', function (e) {
             startY = e.touches[0].clientY;
-            isScrolling = false;
+            startTime = Date.now();
+            isSwipeGesture = false;
         }, { passive: true });
 
-        panel.addEventListener('touchmove', function (e) {
+        panelTabs.addEventListener('touchmove', function (e) {
             if (!startY) return;
 
             currentY = e.touches[0].clientY;
             const diffY = startY - currentY;
+            const diffTime = Date.now() - startTime;
 
-            // Визначаємо напрямок свайпу
-            if (Math.abs(diffY) > 10) {
-                isScrolling = true;
+            // Визначаємо що це жест свайпу (швидкий рух)
+            if (Math.abs(diffY) > 15 && diffTime < 300) {
+                isSwipeGesture = true;
             }
         }, { passive: true });
 
-        panel.addEventListener('touchend', function (e) {
-            if (!isScrolling || !startY || !currentY) return;
+        panelTabs.addEventListener('touchend', function (e) {
+            if (!isSwipeGesture || !startY || !currentY) {
+                startY = 0;
+                currentY = 0;
+                isSwipeGesture = false;
+                return;
+            }
 
             const diffY = startY - currentY;
 
             // Свайп вгору - згорнути панель
-            if (diffY > 50 && !panel.classList.contains('collapsed')) {
+            if (diffY > 30 && !panel.classList.contains('collapsed')) {
                 panel.classList.add('collapsed');
                 toggleBtn.textContent = '⚙️';
                 toggleBtn.style.left = '10px';
             }
             // Свайп вниз - розгорнути панель
-            else if (diffY < -50 && panel.classList.contains('collapsed')) {
+            else if (diffY < -30 && panel.classList.contains('collapsed')) {
                 panel.classList.remove('collapsed');
                 toggleBtn.textContent = '✕';
                 toggleBtn.style.left = 'calc(100vw - 50px)';
@@ -752,7 +764,16 @@ function initMobileSupport() {
 
             startY = 0;
             currentY = 0;
-            isScrolling = false;
+            isSwipeGesture = false;
+        });
+
+        // Додатково: блокуємо закриття панелі при прокрутці контенту
+        const panelContent = panel.querySelectorAll('.panel-content');
+        panelContent.forEach(content => {
+            content.addEventListener('touchstart', function (e) {
+                // Зупиняємо поширення події щоб не спрацьовував свайп
+                e.stopPropagation();
+            }, { passive: true });
         });
     }
 }
